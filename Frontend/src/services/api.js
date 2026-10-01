@@ -34,11 +34,15 @@
 // export const getUserRole=()=>String(getStoredUser()?.role||"").replace(/^ROLE_/i,"").toUpperCase();
 // export const logout=()=>{authAPI.logout();window.location.href="/login"};
 // export default api;
-import axios from "axios";
 
+
+import axios from "axios";
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:8081/api";
+  (import.meta.env.DEV ? "http://localhost:8081/api" : "/api");
+// const API_URL =
+//   import.meta.env.VITE_API_URL ||
+//   "http://localhost:8081/api";
 
 const api = axios.create({
   baseURL: API_URL,
