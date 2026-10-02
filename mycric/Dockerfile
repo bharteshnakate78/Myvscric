@@ -1,8 +1,8 @@
 FROM eclipse-temurin:21-jdk
 
-WORKDIR /app
+WORKDIR /app/mycric
 
-COPY . .
+COPY mycric/ .
 
 RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
