@@ -1,12 +1,12 @@
 FROM eclipse-temurin:21-jdk
 
-WORKDIR /app/mycric
+WORKDIR /app
 
-COPY mycric/ .
+COPY mycric/ mycric/
 
-RUN chmod +x mvnw
-RUN ./mvnw clean package -DskipTests
+RUN chmod +x mycric/mvnw
+RUN cd mycric && ./mvnw clean package -DskipTests
 
 EXPOSE 8081
 
-CMD ["java", "-jar", "target/CricketTournament-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "mycric/target/CricketTournament-0.0.1-SNAPSHOT.jar"]
