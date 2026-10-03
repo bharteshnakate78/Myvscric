@@ -1,4 +1,60 @@
 
+// package mycric.dto;
+
+// public class RegisterRequest {
+
+//     private String name;
+//     private String email;
+//     private String password;
+//     private String role;
+
+//     public RegisterRequest() {
+//     }
+
+//     public RegisterRequest(
+//             String name,
+//             String email,
+//             String password,
+//             String role) {
+
+//         this.name = name;
+//         this.email = email;
+//         this.password = password;
+//         this.role = role;
+//     }
+
+//     public String getName() {
+//         return name;
+//     }
+
+//     public void setName(String name) {
+//         this.name = name;
+//     }
+
+//     public String getEmail() {
+//         return email;
+//     }
+
+//     public void setEmail(String email) {
+//         this.email = email;
+//     }
+
+//     public String getPassword() {
+//         return password;
+//     }
+
+//     public void setPassword(String password) {
+//         this.password = password;
+//     }
+
+//     public String getRole() {
+//         return role;
+//     }
+
+//     public void setRole(String role) {
+//         this.role = role;
+//     }
+// }
 package mycric.dto;
 
 public class RegisterRequest {
@@ -6,7 +62,6 @@ public class RegisterRequest {
     private String name;
     private String email;
     private String password;
-    private String role;
 
     public RegisterRequest() {
     }
@@ -14,14 +69,16 @@ public class RegisterRequest {
     public RegisterRequest(
             String name,
             String email,
-            String password,
-            String role) {
+            String password) {
 
         this.name = name;
         this.email = email;
         this.password = password;
-        this.role = role;
     }
+
+    // =========================================================
+    // NAME
+    // =========================================================
 
     public String getName() {
         return name;
@@ -31,6 +88,10 @@ public class RegisterRequest {
         this.name = name;
     }
 
+    // =========================================================
+    // EMAIL
+    // =========================================================
+
     public String getEmail() {
         return email;
     }
@@ -39,19 +100,15 @@ public class RegisterRequest {
         this.email = email;
     }
 
+    // =========================================================
+    // PASSWORD
+    // =========================================================
+
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 }

@@ -164,33 +164,51 @@ public class AuthServiceImpl implements AuthService {
                 // ROLE
                 // =====================================================
 
+                // Role role = Role.USER;
+
+                // if (request.getRole() != null &&
+                // !request.getRole().trim().isEmpty()) {
+
+                // try {
+
+                // role = Role.valueOf(
+                // request.getRole()
+                // .trim()
+                // .toUpperCase());
+
+                // // Never allow ADMIN through public registration
+                // if (role == Role.ADMIN) {
+                // role = Role.USER;
+                // }
+
+                // } catch (IllegalArgumentException e) {
+
+                // System.out.println(
+                // "Invalid role received: "
+                // + request.getRole());
+
+                // role = Role.USER;
+                // }
+                // }
                 Role role = Role.USER;
 
                 if (request.getRole() != null &&
                                 !request.getRole().trim().isEmpty()) {
 
                         try {
-
                                 role = Role.valueOf(
                                                 request.getRole()
                                                                 .trim()
                                                                 .toUpperCase());
 
-                                // Never allow ADMIN through public registration
                                 if (role == Role.ADMIN) {
                                         role = Role.USER;
                                 }
 
                         } catch (IllegalArgumentException e) {
-
-                                System.out.println(
-                                                "Invalid role received: "
-                                                                + request.getRole());
-
                                 role = Role.USER;
                         }
                 }
-
                 // =====================================================
                 // CREATE USER
                 // =====================================================

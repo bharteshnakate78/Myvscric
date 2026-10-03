@@ -2,6 +2,8 @@ package mycric.config;
 
 import mycric.security.JwtAuthenticationFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,8 +15,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -24,13 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import jakarta.servlet.http.HttpServletResponse;
-
-import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -54,7 +50,7 @@ public class SecurityConfig {
         }
 
         // =========================================================
-        // USER DETAILS SERVICE
+        // AUTHENTICATION PROVIDER
         // =========================================================
 
         @Bean
@@ -83,58 +79,14 @@ public class SecurityConfig {
         }
 
         // =========================================================
-        // CORS
-        // =========================================================
-
-        @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
-
-                CorsConfiguration configuration = new CorsConfiguration();
-
-                configuration.setAllowedOriginPatterns(
-                                List.of(
-                                                "http://localhost:5173",
-                                                "http://127.0.0.1:5173",
-                                                "http://localhost:5174",
-                                                "http://127.0.0.1:5174",
-                                                "https://myvscric.vercel.app"));
-
-                configuration.setAllowedMethods(
-                                List.of(
-                                                "GET",
-                                                "POST",
-                                                "PUT",
-                                                "DELETE",
-                                                "PATCH",
-                                                "OPTIONS"));
-
-                configuration.setAllowedHeaders(
-                                List.of("*"));
-
-                configuration.setExposedHeaders(
-                                List.of(
-                                                "Authorization",
-                                                "Content-Type"));
-
-                configuration.setAllowCredentials(true);
-
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-                source.registerCorsConfiguration(
-                                "/**",
-                                configuration);
-
-                return source;
-        }
-
-        // =========================================================
-        // SECURITY
+        // SECURITY FILTER CHAIN
         // =========================================================
 
         @Bean
         public SecurityFilterChain securityFilterChain(
                         HttpSecurity http,
-                        AuthenticationProvider authenticationProvider)
+                        AuthenticationProvider authenticationProvider,
+                        CorsConfigurationSource corsConfigurationSource)
                         throws Exception {
 
                 http
@@ -149,8 +101,7 @@ public class SecurityConfig {
                                 // CORS
                                 // -------------------------------------------------
 
-                                .cors(cors -> cors.configurationSource(
-                                                corsConfigurationSource()))
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
                                 // -------------------------------------------------
                                 // SESSION
@@ -164,6 +115,7 @@ public class SecurityConfig {
                                 // -------------------------------------------------
 
                                 .exceptionHandling(exceptions -> exceptions
+
                                                 .authenticationEntryPoint(
                                                                 (request, response, exception) -> response.sendError(
                                                                                 HttpServletResponse.SC_UNAUTHORIZED))
@@ -178,31 +130,52 @@ public class SecurityConfig {
 
                                 .authorizeHttpRequests(auth -> auth
 
-                                                // OPTIONS / CORS PREFLIGHT
+                                                // =================================================
+                                                // CORS PREFLIGHT
+                                                // =================================================
+
                                                 .requestMatchers(
                                                                 HttpMethod.OPTIONS,
                                                                 "/**")
                                                 .permitAll()
 
+                                                // =================================================
+                                                // HOME / HEALTH
+                                                // =================================================
+
+                                                .requestMatchers(
+                                                                "/",
+                                                                "/api/test")
+                                                .permitAll()
+
+                                                // =================================================
                                                 // AUTH
+                                                // =================================================
+
                                                 .requestMatchers(
                                                                 "/api/auth/**")
                                                 .permitAll()
 
+                                                // =================================================
                                                 // SWAGGER
+                                                // =================================================
+
                                                 .requestMatchers(
                                                                 "/swagger-ui/**",
                                                                 "/swagger-ui.html",
                                                                 "/v3/api-docs/**")
                                                 .permitAll()
 
+                                                // =================================================
                                                 // WEBSOCKET
+                                                // =================================================
+
                                                 .requestMatchers(
                                                                 "/ws/**")
                                                 .permitAll()
 
                                                 // =================================================
-                                                // PUBLIC GET APIs
+                                                // PUBLIC GET - TOURNAMENTS
                                                 // =================================================
 
                                                 .requestMatchers(
@@ -211,11 +184,19 @@ public class SecurityConfig {
                                                                 "/api/tournaments/**")
                                                 .permitAll()
 
+                                                // =================================================
+                                                // PUBLIC GET - TEAMS
+                                                // =================================================
+
                                                 .requestMatchers(
                                                                 HttpMethod.GET,
                                                                 "/api/teams",
                                                                 "/api/teams/**")
                                                 .permitAll()
+
+                                                // =================================================
+                                                // PUBLIC GET - PLAYERS
+                                                // =================================================
 
                                                 .requestMatchers(
                                                                 HttpMethod.GET,
@@ -223,17 +204,29 @@ public class SecurityConfig {
                                                                 "/api/players/**")
                                                 .permitAll()
 
+                                                // =================================================
+                                                // PUBLIC GET - MATCHES
+                                                // =================================================
+
                                                 .requestMatchers(
                                                                 HttpMethod.GET,
                                                                 "/api/matches",
                                                                 "/api/matches/**")
                                                 .permitAll()
 
+                                                // =================================================
+                                                // PUBLIC GET - SCORES
+                                                // =================================================
+
                                                 .requestMatchers(
                                                                 HttpMethod.GET,
                                                                 "/api/scores",
                                                                 "/api/scores/**")
                                                 .permitAll()
+
+                                                // =================================================
+                                                // PUBLIC GET - INNINGS
+                                                // =================================================
 
                                                 .requestMatchers(
                                                                 HttpMethod.GET,
@@ -258,7 +251,7 @@ public class SecurityConfig {
                                                 .hasRole("ADMIN")
 
                                                 // =================================================
-                                                // TOURNAMENT
+                                                // TOURNAMENT WRITE ACCESS
                                                 // =================================================
 
                                                 .requestMatchers(
@@ -287,7 +280,7 @@ public class SecurityConfig {
                                                                 "SCORER")
 
                                                 // =================================================
-                                                // TEAM
+                                                // TEAM WRITE ACCESS
                                                 // =================================================
 
                                                 .requestMatchers(
@@ -318,7 +311,7 @@ public class SecurityConfig {
                                                                 "SCORER")
 
                                                 // =================================================
-                                                // PLAYER
+                                                // PLAYER WRITE ACCESS
                                                 // =================================================
 
                                                 .requestMatchers(
@@ -346,7 +339,7 @@ public class SecurityConfig {
                                                                 "ORGANIZER")
 
                                                 // =================================================
-                                                // MATCH
+                                                // MATCH WRITE ACCESS
                                                 // =================================================
 
                                                 .requestMatchers(
@@ -377,7 +370,7 @@ public class SecurityConfig {
                                                                 "SCORER")
 
                                                 // =================================================
-                                                // SCORE
+                                                // SCORE WRITE ACCESS
                                                 // =================================================
 
                                                 .requestMatchers(
@@ -390,6 +383,14 @@ public class SecurityConfig {
 
                                                 .requestMatchers(
                                                                 HttpMethod.PUT,
+                                                                "/api/scores/**")
+                                                .hasAnyRole(
+                                                                "ADMIN",
+                                                                "ORGANIZER",
+                                                                "SCORER")
+
+                                                .requestMatchers(
+                                                                HttpMethod.DELETE,
                                                                 "/api/scores/**")
                                                 .hasAnyRole(
                                                                 "ADMIN",
@@ -400,7 +401,8 @@ public class SecurityConfig {
                                                 // EVERYTHING ELSE
                                                 // =================================================
 
-                                                .anyRequest().authenticated())
+                                                .anyRequest()
+                                                .authenticated())
 
                                 // -------------------------------------------------
                                 // AUTHENTICATION PROVIDER
