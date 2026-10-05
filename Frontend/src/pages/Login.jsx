@@ -306,9 +306,9 @@ const Login = () => {
             </div>
 
             <div>
-              <div className="premium-brand-title">CRICKET SCORE</div>
+              <div className="premium-brand-title">MYVS</div>
 
-              <div className="premium-brand-subtitle">COMMAND CENTER</div>
+              <div className="premium-brand-subtitle">CRIC</div>
             </div>
           </div>
 
@@ -382,7 +382,7 @@ const Login = () => {
 
             <span className="footer-separator">•</span>
 
-            <span>© 2026</span>
+            <span> BHARTESH NAKATE n© 2026</span>
           </div>
         </aside>
 
@@ -400,9 +400,9 @@ const Login = () => {
               </div>
 
               <div>
-                <strong>CRICKET SCORE</strong>
+                <strong>MYVS</strong>
 
-                <span>COMMAND CENTER</span>
+                <span>CRIC</span>
               </div>
             </div>
 

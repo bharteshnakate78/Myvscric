@@ -178,9 +178,9 @@ const Signup = () => {
               </div>
 
               <div>
-                <div className="logo-title">CRICKET SCORE</div>
+                <div className="logo-title">MYVS</div>
 
-                <div className="logo-subtitle">COMMAND CENTER</div>
+                <div className="logo-subtitle">CRIC</div>
               </div>
             </div>
 
