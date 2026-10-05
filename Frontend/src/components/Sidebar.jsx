@@ -31,7 +31,7 @@ function Sidebar({ mobileOpen, setMobileOpen }) {
   const menuItems = [
     {
       label: "Dashboard",
-      path: "/dashboard",
+      path: role === ROLES.ADMIN ? "/admin" : "/dashboard",
       icon: LayoutDashboard,
       roles: [ROLES.ADMIN, ROLES.ORGANIZER, ROLES.SCORER, ROLES.USER],
     },
@@ -67,7 +67,7 @@ function Sidebar({ mobileOpen, setMobileOpen }) {
     },
     {
       label: "Users",
-      path: "/users",
+      path: "/admin/users",
       icon: ShieldCheck,
       roles: [ROLES.ADMIN],
     },

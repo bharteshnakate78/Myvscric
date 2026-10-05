@@ -17,16 +17,18 @@ function Topbar({ onMenuClick }) {
   const role = getStoredRole();
 
   const pageNames = {
+    "/admin": "Admin Dashboard",
+    "/admin/users": "User Management",
     "/dashboard": "Dashboard",
     "/tournaments": "Tournaments",
     "/teams": "Teams",
     "/players": "Players",
     "/matches": "Matches",
     "/scoreboard": "Live Scoreboard",
-    "/users": "User Management",
   };
 
-  const currentPage = pageNames[location.pathname] || "Command Center";
+  const currentPage =
+    pageNames[location.pathname] || pageNames["/dashboard"] || "Command Center";
 
   return (
     <header className="topbar">

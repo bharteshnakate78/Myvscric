@@ -1,14 +1,3 @@
-export const canManageScores = (role = null) => {
-  const currentRole = role
-    ? normalizeRole(role)
-    : getStoredRole();
-
-  return (
-    currentRole === ROLES.ADMIN ||
-    currentRole === ROLES.ORGANIZER ||
-    currentRole === ROLES.SCORER
-  );
-};
 // ============================================================
 // ROLES
 // ============================================================
@@ -45,6 +34,15 @@ export const ROLE_OPTIONS = [
 
 // ============================================================
 // NORMALIZE ROLE
+//
+// Supports:
+//
+// ADMIN
+// admin
+// Admin
+// ROLE_ADMIN
+// role_admin
+// ROLE_admin
 // ============================================================
 
 export const normalizeRole = (role) => {
@@ -57,7 +55,9 @@ export const normalizeRole = (role) => {
     .toUpperCase()
     .replace(/^ROLE_/, "");
 
-  if (Object.values(ROLES).includes(normalized)) {
+  if (
+    Object.values(ROLES).includes(normalized)
+  ) {
     return normalized;
   }
 
@@ -66,15 +66,11 @@ export const normalizeRole = (role) => {
 
 // ============================================================
 // ROLE LABEL
-//
-// ADMIN      -> Administrator
-// ORGANIZER  -> Organizer
-// SCORER     -> Scorer
-// USER       -> User
 // ============================================================
 
 export const roleLabel = (role) => {
-  const normalizedRole = normalizeRole(role);
+  const normalizedRole =
+    normalizeRole(role);
 
   const labels = {
     [ROLES.ADMIN]: "Administrator",
@@ -83,7 +79,9 @@ export const roleLabel = (role) => {
     [ROLES.USER]: "User",
   };
 
-  return labels[normalizedRole] || "User";
+  return (
+    labels[normalizedRole] || "User"
+  );
 };
 
 // ============================================================
@@ -92,7 +90,8 @@ export const roleLabel = (role) => {
 
 export const getStoredUser = () => {
   try {
-    const storedUser = localStorage.getItem("user");
+    const storedUser =
+      localStorage.getItem("user");
 
     if (!storedUser) {
       return null;
@@ -124,31 +123,56 @@ export const getStoredRole = () => {
 // ============================================================
 
 export const isAdmin = () => {
-  return getStoredRole() === ROLES.ADMIN;
+  return (
+    getStoredRole() === ROLES.ADMIN
+  );
 };
 
 export const isOrganizer = () => {
-  return getStoredRole() === ROLES.ORGANIZER;
+  return (
+    getStoredRole() === ROLES.ORGANIZER
+  );
 };
 
 export const isScorer = () => {
-  return getStoredRole() === ROLES.SCORER;
+  return (
+    getStoredRole() === ROLES.SCORER
+  );
 };
 
 export const isUser = () => {
-  return getStoredRole() === ROLES.USER;
+  return (
+    getStoredRole() === ROLES.USER
+  );
 };
 
 // ============================================================
 // CRICKET MANAGEMENT
-//
-// ADMIN      -> YES
-// ORGANIZER  -> YES
-// SCORER     -> YES
-// USER       -> NO
+// ADMIN / ORGANIZER / SCORER
 // ============================================================
 
-export const canManageCricket = (role = null) => {
+export const canManageCricket = (
+  role = null
+) => {
+  const currentRole = role
+    ? normalizeRole(role)
+    : getStoredRole();
+
+  return (
+    currentRole === ROLES.ADMIN ||
+    currentRole === ROLES.ORGANIZER ||
+    currentRole === ROLES.SCORER
+  );
+};
+
+// ============================================================
+// SCORE MANAGEMENT
+// ADMIN / ORGANIZER / SCORER
+// ============================================================
+
+export const canManageScores = (
+  role = null
+) => {
   const currentRole = role
     ? normalizeRole(role)
     : getStoredRole();
@@ -162,23 +186,29 @@ export const canManageCricket = (role = null) => {
 
 // ============================================================
 // USER MANAGEMENT
-//
-// Only ADMIN
+// ADMIN ONLY
 // ============================================================
 
-export const canManageUsers = (role = null) => {
+export const canManageUsers = (
+  role = null
+) => {
   const currentRole = role
     ? normalizeRole(role)
     : getStoredRole();
 
-  return currentRole === ROLES.ADMIN;
+  return (
+    currentRole === ROLES.ADMIN
+  );
 };
 
 // ============================================================
 // TOURNAMENT MANAGEMENT
+// ADMIN / ORGANIZER / SCORER
 // ============================================================
 
-export const canManageTournaments = (role = null) => {
+export const canManageTournaments = (
+  role = null
+) => {
   const currentRole = role
     ? normalizeRole(role)
     : getStoredRole();
@@ -192,9 +222,12 @@ export const canManageTournaments = (role = null) => {
 
 // ============================================================
 // TEAM MANAGEMENT
+// ADMIN / ORGANIZER / SCORER
 // ============================================================
 
-export const canManageTeams = (role = null) => {
+export const canManageTeams = (
+  role = null
+) => {
   const currentRole = role
     ? normalizeRole(role)
     : getStoredRole();
@@ -208,9 +241,12 @@ export const canManageTeams = (role = null) => {
 
 // ============================================================
 // PLAYER MANAGEMENT
+// ADMIN / ORGANIZER / SCORER
 // ============================================================
 
-export const canManagePlayers = (role = null) => {
+export const canManagePlayers = (
+  role = null
+) => {
   const currentRole = role
     ? normalizeRole(role)
     : getStoredRole();
@@ -224,9 +260,12 @@ export const canManagePlayers = (role = null) => {
 
 // ============================================================
 // MATCH MANAGEMENT
+// ADMIN / ORGANIZER / SCORER
 // ============================================================
 
-export const canManageMatches = (role = null) => {
+export const canManageMatches = (
+  role = null
+) => {
   const currentRole = role
     ? normalizeRole(role)
     : getStoredRole();
@@ -240,9 +279,12 @@ export const canManageMatches = (role = null) => {
 
 // ============================================================
 // SCORING
+// ADMIN / ORGANIZER / SCORER
 // ============================================================
 
-export const canScore = (role = null) => {
+export const canScore = (
+  role = null
+) => {
   const currentRole = role
     ? normalizeRole(role)
     : getStoredRole();
@@ -271,23 +313,33 @@ export const canViewScoreboard = () => {
 // ============================================================
 
 export const hasRole = (role) => {
-  return getStoredRole() === normalizeRole(role);
+  return (
+    getStoredRole() ===
+    normalizeRole(role)
+  );
 };
 
 // ============================================================
 // MULTIPLE ROLE CHECK
 // ============================================================
 
-export const hasAnyRole = (roles = []) => {
-  const currentRole = getStoredRole();
+export const hasAnyRole = (
+  roles = []
+) => {
+  const currentRole =
+    getStoredRole();
 
   return roles
-    .map((role) => normalizeRole(role))
+    .map((role) =>
+      normalizeRole(role)
+    )
     .includes(currentRole);
 };
 
 
-
+// // ============================================================
+// // ROLES
+// // ============================================================
 
 // export const ROLES = {
 //   ADMIN: "ADMIN",
@@ -295,6 +347,10 @@ export const hasAnyRole = (roles = []) => {
 //   SCORER: "SCORER",
 //   USER: "USER",
 // };
+
+// // ============================================================
+// // ROLE OPTIONS
+// // ============================================================
 
 // export const ROLE_OPTIONS = [
 //   {
@@ -315,18 +371,15 @@ export const hasAnyRole = (roles = []) => {
 //   },
 // ];
 
-// /*
-//  * Normalize role values coming from:
-//  *
-//  * ADMIN
-//  * admin
-//  * ROLE_ADMIN
-//  * role_admin
-//  *
-//  * into:
-//  *
-//  * ADMIN
-//  */
+// // ============================================================
+// // NORMALIZE ROLE
+// // Supports:
+// // ADMIN
+// // admin
+// // ROLE_ADMIN
+// // role_admin
+// // ============================================================
+
 // export const normalizeRole = (role) => {
 //   if (!role) {
 //     return ROLES.USER;
@@ -344,34 +397,27 @@ export const hasAnyRole = (roles = []) => {
 //   return ROLES.USER;
 // };
 
-// /*
-//  * Get the currently logged-in user's role
-//  * from localStorage.
-//  */
-// export const getStoredRole = () => {
-//   try {
-//     const storedUser = localStorage.getItem("user");
+// // ============================================================
+// // ROLE LABEL
+// // ============================================================
 
-//     if (!storedUser) {
-//       return ROLES.USER;
-//     }
+// export const roleLabel = (role) => {
+//   const normalizedRole = normalizeRole(role);
 
-//     const user = JSON.parse(storedUser);
+//   const labels = {
+//     [ROLES.ADMIN]: "Administrator",
+//     [ROLES.ORGANIZER]: "Organizer",
+//     [ROLES.SCORER]: "Scorer",
+//     [ROLES.USER]: "User",
+//   };
 
-//     return normalizeRole(user?.role);
-//   } catch (error) {
-//     console.error(
-//       "Unable to read stored user role:",
-//       error
-//     );
-
-//     return ROLES.USER;
-//   }
+//   return labels[normalizedRole] || "User";
 // };
 
-// /*
-//  * Get the complete stored user.
-//  */
+// // ============================================================
+// // GET STORED USER
+// // ============================================================
+
 // export const getStoredUser = () => {
 //   try {
 //     const storedUser = localStorage.getItem("user");
@@ -382,18 +428,25 @@ export const hasAnyRole = (roles = []) => {
 
 //     return JSON.parse(storedUser);
 //   } catch (error) {
-//     console.error(
-//       "Unable to read stored user:",
-//       error
-//     );
-
+//     console.error("Unable to read stored user:", error);
 //     return null;
 //   }
 // };
 
-// /*
-//  * Role helper functions.
-//  */
+// // ============================================================
+// // GET STORED ROLE
+// // ============================================================
+
+// export const getStoredRole = () => {
+//   const user = getStoredUser();
+
+//   return normalizeRole(user?.role);
+// };
+
+// // ============================================================
+// // BASIC ROLE CHECKS
+// // ============================================================
+
 // export const isAdmin = () => {
 //   return getStoredRole() === ROLES.ADMIN;
 // };
@@ -409,3 +462,580 @@ export const hasAnyRole = (roles = []) => {
 // export const isUser = () => {
 //   return getStoredRole() === ROLES.USER;
 // };
+
+// // ============================================================
+// // CRICKET MANAGEMENT
+// // ADMIN / ORGANIZER / SCORER
+// // ============================================================
+
+// export const canManageCricket = (role = null) => {
+//   const currentRole = role
+//     ? normalizeRole(role)
+//     : getStoredRole();
+
+//   return (
+//     currentRole === ROLES.ADMIN ||
+//     currentRole === ROLES.ORGANIZER ||
+//     currentRole === ROLES.SCORER
+//   );
+// };
+
+// // ============================================================
+// // SCORE MANAGEMENT
+// // ADMIN / ORGANIZER / SCORER
+// // ============================================================
+
+// export const canManageScores = (role = null) => {
+//   const currentRole = role
+//     ? normalizeRole(role)
+//     : getStoredRole();
+
+//   return (
+//     currentRole === ROLES.ADMIN ||
+//     currentRole === ROLES.ORGANIZER ||
+//     currentRole === ROLES.SCORER
+//   );
+// };
+
+// // ============================================================
+// // USER MANAGEMENT
+// // ADMIN ONLY
+// // ============================================================
+
+// export const canManageUsers = (role = null) => {
+//   const currentRole = role
+//     ? normalizeRole(role)
+//     : getStoredRole();
+
+//   return currentRole === ROLES.ADMIN;
+// };
+
+// // ============================================================
+// // TOURNAMENT MANAGEMENT
+// // ADMIN / ORGANIZER / SCORER
+// // ============================================================
+
+// export const canManageTournaments = (role = null) => {
+//   const currentRole = role
+//     ? normalizeRole(role)
+//     : getStoredRole();
+
+//   return (
+//     currentRole === ROLES.ADMIN ||
+//     currentRole === ROLES.ORGANIZER ||
+//     currentRole === ROLES.SCORER
+//   );
+// };
+
+// // ============================================================
+// // TEAM MANAGEMENT
+// // ADMIN / ORGANIZER / SCORER
+// // ============================================================
+
+// export const canManageTeams = (role = null) => {
+//   const currentRole = role
+//     ? normalizeRole(role)
+//     : getStoredRole();
+
+//   return (
+//     currentRole === ROLES.ADMIN ||
+//     currentRole === ROLES.ORGANIZER ||
+//     currentRole === ROLES.SCORER
+//   );
+// };
+
+// // ============================================================
+// // PLAYER MANAGEMENT
+// // ADMIN / ORGANIZER / SCORER
+// // ============================================================
+
+// export const canManagePlayers = (role = null) => {
+//   const currentRole = role
+//     ? normalizeRole(role)
+//     : getStoredRole();
+
+//   return (
+//     currentRole === ROLES.ADMIN ||
+//     currentRole === ROLES.ORGANIZER ||
+//     currentRole === ROLES.SCORER
+//   );
+// };
+
+// // ============================================================
+// // MATCH MANAGEMENT
+// // ADMIN / ORGANIZER / SCORER
+// // ============================================================
+
+// export const canManageMatches = (role = null) => {
+//   const currentRole = role
+//     ? normalizeRole(role)
+//     : getStoredRole();
+
+//   return (
+//     currentRole === ROLES.ADMIN ||
+//     currentRole === ROLES.ORGANIZER ||
+//     currentRole === ROLES.SCORER
+//   );
+// };
+
+// // ============================================================
+// // SCORING
+// // ADMIN / ORGANIZER / SCORER
+// // ============================================================
+
+// export const canScore = (role = null) => {
+//   const currentRole = role
+//     ? normalizeRole(role)
+//     : getStoredRole();
+
+//   return (
+//     currentRole === ROLES.ADMIN ||
+//     currentRole === ROLES.ORGANIZER ||
+//     currentRole === ROLES.SCORER
+//   );
+// };
+
+// // ============================================================
+// // VIEW PERMISSIONS
+// // ============================================================
+
+// export const canViewDashboard = () => {
+//   return Boolean(getStoredUser());
+// };
+
+// export const canViewScoreboard = () => {
+//   return Boolean(getStoredUser());
+// };
+
+// // ============================================================
+// // GENERIC ROLE CHECK
+// // ============================================================
+
+// export const hasRole = (role) => {
+//   return getStoredRole() === normalizeRole(role);
+// };
+
+// // ============================================================
+// // MULTIPLE ROLE CHECK
+// // ============================================================
+
+// export const hasAnyRole = (roles = []) => {
+//   const currentRole = getStoredRole();
+
+//   return roles
+//     .map((role) => normalizeRole(role))
+//     .includes(currentRole);
+// };
+
+
+// // export const canManageScores = (role = null) => {
+// //   const currentRole = role
+// //     ? normalizeRole(role)
+// //     : getStoredRole();
+
+// //   return (
+// //     currentRole === ROLES.ADMIN ||
+// //     currentRole === ROLES.ORGANIZER ||
+// //     currentRole === ROLES.SCORER
+// //   );
+// // };
+// // // ============================================================
+// // // ROLES
+// // // ============================================================
+
+// // export const ROLES = {
+// //   ADMIN: "ADMIN",
+// //   ORGANIZER: "ORGANIZER",
+// //   SCORER: "SCORER",
+// //   USER: "USER",
+// // };
+
+// // // ============================================================
+// // // ROLE OPTIONS
+// // // ============================================================
+
+// // export const ROLE_OPTIONS = [
+// //   {
+// //     value: ROLES.ADMIN,
+// //     label: "Administrator",
+// //   },
+// //   {
+// //     value: ROLES.ORGANIZER,
+// //     label: "Organizer",
+// //   },
+// //   {
+// //     value: ROLES.SCORER,
+// //     label: "Scorer",
+// //   },
+// //   {
+// //     value: ROLES.USER,
+// //     label: "User",
+// //   },
+// // ];
+
+// // // ============================================================
+// // // NORMALIZE ROLE
+// // // ============================================================
+
+// // export const normalizeRole = (role) => {
+// //   if (!role) {
+// //     return ROLES.USER;
+// //   }
+
+// //   const normalized = String(role)
+// //     .trim()
+// //     .toUpperCase()
+// //     .replace(/^ROLE_/, "");
+
+// //   if (Object.values(ROLES).includes(normalized)) {
+// //     return normalized;
+// //   }
+
+// //   return ROLES.USER;
+// // };
+
+// // // ============================================================
+// // // ROLE LABEL
+// // //
+// // // ADMIN      -> Administrator
+// // // ORGANIZER  -> Organizer
+// // // SCORER     -> Scorer
+// // // USER       -> User
+// // // ============================================================
+
+// // export const roleLabel = (role) => {
+// //   const normalizedRole = normalizeRole(role);
+
+// //   const labels = {
+// //     [ROLES.ADMIN]: "Administrator",
+// //     [ROLES.ORGANIZER]: "Organizer",
+// //     [ROLES.SCORER]: "Scorer",
+// //     [ROLES.USER]: "User",
+// //   };
+
+// //   return labels[normalizedRole] || "User";
+// // };
+
+// // // ============================================================
+// // // GET STORED USER
+// // // ============================================================
+
+// // export const getStoredUser = () => {
+// //   try {
+// //     const storedUser = localStorage.getItem("user");
+
+// //     if (!storedUser) {
+// //       return null;
+// //     }
+
+// //     return JSON.parse(storedUser);
+// //   } catch (error) {
+// //     console.error(
+// //       "Unable to read stored user:",
+// //       error
+// //     );
+
+// //     return null;
+// //   }
+// // };
+
+// // // ============================================================
+// // // GET STORED ROLE
+// // // ============================================================
+
+// // export const getStoredRole = () => {
+// //   const user = getStoredUser();
+
+// //   return normalizeRole(user?.role);
+// // };
+
+// // // ============================================================
+// // // BASIC ROLE CHECKS
+// // // ============================================================
+
+// // export const isAdmin = () => {
+// //   return getStoredRole() === ROLES.ADMIN;
+// // };
+
+// // export const isOrganizer = () => {
+// //   return getStoredRole() === ROLES.ORGANIZER;
+// // };
+
+// // export const isScorer = () => {
+// //   return getStoredRole() === ROLES.SCORER;
+// // };
+
+// // export const isUser = () => {
+// //   return getStoredRole() === ROLES.USER;
+// // };
+
+// // // ============================================================
+// // // CRICKET MANAGEMENT
+// // //
+// // // ADMIN      -> YES
+// // // ORGANIZER  -> YES
+// // // SCORER     -> YES
+// // // USER       -> NO
+// // // ============================================================
+
+// // export const canManageCricket = (role = null) => {
+// //   const currentRole = role
+// //     ? normalizeRole(role)
+// //     : getStoredRole();
+
+// //   return (
+// //     currentRole === ROLES.ADMIN ||
+// //     currentRole === ROLES.ORGANIZER ||
+// //     currentRole === ROLES.SCORER
+// //   );
+// // };
+
+// // // ============================================================
+// // // USER MANAGEMENT
+// // //
+// // // Only ADMIN
+// // // ============================================================
+
+// // export const canManageUsers = (role = null) => {
+// //   const currentRole = role
+// //     ? normalizeRole(role)
+// //     : getStoredRole();
+
+// //   return currentRole === ROLES.ADMIN;
+// // };
+
+// // // ============================================================
+// // // TOURNAMENT MANAGEMENT
+// // // ============================================================
+
+// // export const canManageTournaments = (role = null) => {
+// //   const currentRole = role
+// //     ? normalizeRole(role)
+// //     : getStoredRole();
+
+// //   return (
+// //     currentRole === ROLES.ADMIN ||
+// //     currentRole === ROLES.ORGANIZER ||
+// //     currentRole === ROLES.SCORER
+// //   );
+// // };
+
+// // // ============================================================
+// // // TEAM MANAGEMENT
+// // // ============================================================
+
+// // export const canManageTeams = (role = null) => {
+// //   const currentRole = role
+// //     ? normalizeRole(role)
+// //     : getStoredRole();
+
+// //   return (
+// //     currentRole === ROLES.ADMIN ||
+// //     currentRole === ROLES.ORGANIZER ||
+// //     currentRole === ROLES.SCORER
+// //   );
+// // };
+
+// // // ============================================================
+// // // PLAYER MANAGEMENT
+// // // ============================================================
+
+// // export const canManagePlayers = (role = null) => {
+// //   const currentRole = role
+// //     ? normalizeRole(role)
+// //     : getStoredRole();
+
+// //   return (
+// //     currentRole === ROLES.ADMIN ||
+// //     currentRole === ROLES.ORGANIZER ||
+// //     currentRole === ROLES.SCORER
+// //   );
+// // };
+
+// // // ============================================================
+// // // MATCH MANAGEMENT
+// // // ============================================================
+
+// // export const canManageMatches = (role = null) => {
+// //   const currentRole = role
+// //     ? normalizeRole(role)
+// //     : getStoredRole();
+
+// //   return (
+// //     currentRole === ROLES.ADMIN ||
+// //     currentRole === ROLES.ORGANIZER ||
+// //     currentRole === ROLES.SCORER
+// //   );
+// // };
+
+// // // ============================================================
+// // // SCORING
+// // // ============================================================
+
+// // export const canScore = (role = null) => {
+// //   const currentRole = role
+// //     ? normalizeRole(role)
+// //     : getStoredRole();
+
+// //   return (
+// //     currentRole === ROLES.ADMIN ||
+// //     currentRole === ROLES.ORGANIZER ||
+// //     currentRole === ROLES.SCORER
+// //   );
+// // };
+
+// // // ============================================================
+// // // VIEW PERMISSIONS
+// // // ============================================================
+
+// // export const canViewDashboard = () => {
+// //   return Boolean(getStoredUser());
+// // };
+
+// // export const canViewScoreboard = () => {
+// //   return Boolean(getStoredUser());
+// // };
+
+// // // ============================================================
+// // // GENERIC ROLE CHECK
+// // // ============================================================
+
+// // export const hasRole = (role) => {
+// //   return getStoredRole() === normalizeRole(role);
+// // };
+
+// // // ============================================================
+// // // MULTIPLE ROLE CHECK
+// // // ============================================================
+
+// // export const hasAnyRole = (roles = []) => {
+// //   const currentRole = getStoredRole();
+
+// //   return roles
+// //     .map((role) => normalizeRole(role))
+// //     .includes(currentRole);
+// // };
+
+
+
+
+// // // export const ROLES = {
+// // //   ADMIN: "ADMIN",
+// // //   ORGANIZER: "ORGANIZER",
+// // //   SCORER: "SCORER",
+// // //   USER: "USER",
+// // // };
+
+// // // export const ROLE_OPTIONS = [
+// // //   {
+// // //     value: ROLES.ADMIN,
+// // //     label: "Administrator",
+// // //   },
+// // //   {
+// // //     value: ROLES.ORGANIZER,
+// // //     label: "Organizer",
+// // //   },
+// // //   {
+// // //     value: ROLES.SCORER,
+// // //     label: "Scorer",
+// // //   },
+// // //   {
+// // //     value: ROLES.USER,
+// // //     label: "User",
+// // //   },
+// // // ];
+
+// // // /*
+// // //  * Normalize role values coming from:
+// // //  *
+// // //  * ADMIN
+// // //  * admin
+// // //  * ROLE_ADMIN
+// // //  * role_admin
+// // //  *
+// // //  * into:
+// // //  *
+// // //  * ADMIN
+// // //  */
+// // // export const normalizeRole = (role) => {
+// // //   if (!role) {
+// // //     return ROLES.USER;
+// // //   }
+
+// // //   const normalized = String(role)
+// // //     .trim()
+// // //     .toUpperCase()
+// // //     .replace(/^ROLE_/, "");
+
+// // //   if (Object.values(ROLES).includes(normalized)) {
+// // //     return normalized;
+// // //   }
+
+// // //   return ROLES.USER;
+// // // };
+
+// // // /*
+// // //  * Get the currently logged-in user's role
+// // //  * from localStorage.
+// // //  */
+// // // export const getStoredRole = () => {
+// // //   try {
+// // //     const storedUser = localStorage.getItem("user");
+
+// // //     if (!storedUser) {
+// // //       return ROLES.USER;
+// // //     }
+
+// // //     const user = JSON.parse(storedUser);
+
+// // //     return normalizeRole(user?.role);
+// // //   } catch (error) {
+// // //     console.error(
+// // //       "Unable to read stored user role:",
+// // //       error
+// // //     );
+
+// // //     return ROLES.USER;
+// // //   }
+// // // };
+
+// // // /*
+// // //  * Get the complete stored user.
+// // //  */
+// // // export const getStoredUser = () => {
+// // //   try {
+// // //     const storedUser = localStorage.getItem("user");
+
+// // //     if (!storedUser) {
+// // //       return null;
+// // //     }
+
+// // //     return JSON.parse(storedUser);
+// // //   } catch (error) {
+// // //     console.error(
+// // //       "Unable to read stored user:",
+// // //       error
+// // //     );
+
+// // //     return null;
+// // //   }
+// // // };
+
+// // // /*
+// // //  * Role helper functions.
+// // //  */
+// // // export const isAdmin = () => {
+// // //   return getStoredRole() === ROLES.ADMIN;
+// // // };
+
+// // // export const isOrganizer = () => {
+// // //   return getStoredRole() === ROLES.ORGANIZER;
+// // // };
+
+// // // export const isScorer = () => {
+// // //   return getStoredRole() === ROLES.SCORER;
+// // // };
+
+// // // export const isUser = () => {
+// // //   return getStoredRole() === ROLES.USER;
+// // // };

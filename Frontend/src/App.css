@@ -189,3 +189,175 @@ tr:hover {
   font-size: 0.9rem;
   opacity: 0.9;
 }
+
+/* =========================================================
+   ADMIN DASHBOARD
+   ========================================================= */
+
+.dashboard-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 34px 40px 60px;
+  box-sizing: border-box;
+}
+
+.dashboard-header {
+  margin-bottom: 34px;
+}
+
+.dashboard-header p {
+  margin: 0 0 12px;
+  color: #a8b4c7;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 40px;
+  line-height: 1.15;
+  font-weight: 750;
+  letter-spacing: -0.8px;
+}
+
+.dashboard-header span {
+  display: block;
+  margin-top: 14px;
+  color: #a8b4c7;
+  font-size: 16px;
+}
+
+/* =========================
+   DASHBOARD GRID
+   ========================= */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* =========================
+   DASHBOARD CARD
+   ========================= */
+
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 190px;
+  padding: 26px;
+
+  box-sizing: border-box;
+
+  background: #101925;
+  border: 1px solid #1e2b3d;
+  border-radius: 16px;
+
+  color: #f8fafc;
+  text-decoration: none !important;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.dashboard-card:visited {
+  color: #f8fafc;
+  text-decoration: none !important;
+}
+
+.dashboard-card:hover {
+  color: #f8fafc;
+  text-decoration: none !important;
+
+  transform: translateY(-4px);
+
+  background: #141f2e;
+  border-color: #334155;
+
+  box-shadow:
+    0 16px 35px rgba(0, 0, 0, 0.28);
+}
+
+.dashboard-card:active {
+  color: #f8fafc;
+  text-decoration: none !important;
+}
+
+/* =========================
+   CARD ICON
+   ========================= */
+
+.dashboard-card svg {
+  width: 30px;
+  height: 30px;
+
+  margin-bottom: 24px;
+
+  color: #60a5fa;
+
+  stroke-width: 1.8;
+}
+
+/* =========================
+   CARD TITLE
+   ========================= */
+
+.dashboard-card h3 {
+  margin: 0 0 10px;
+
+  color: #f8fafc;
+
+  font-size: 19px;
+  line-height: 1.35;
+  font-weight: 650;
+}
+
+/* =========================
+   CARD DESCRIPTION
+   ========================= */
+
+.dashboard-card p {
+  margin: 0;
+
+  color: #94a3b8;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 1000px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    max-width: 700px;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-page {
+    padding: 26px 20px 45px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 32px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-card {
+    min-height: 170px;
+    padding: 22px;
+  }
+}
