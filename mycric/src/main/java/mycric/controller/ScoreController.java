@@ -1,4 +1,3 @@
-
 package mycric.controller;
 
 import mycric.dto.ScoreRequest;
@@ -6,6 +5,7 @@ import mycric.entity.Score;
 import mycric.service.ScoreService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +19,10 @@ public class ScoreController {
         @Autowired
         private ScoreService scoreService;
 
+        // =========================================================
+        // CREATE SCORE
+        // =========================================================
+
         @PostMapping
         public ResponseEntity<Score> saveScore(
                         @RequestBody Score score) {
@@ -27,12 +31,20 @@ public class ScoreController {
                                 scoreService.saveScore(score));
         }
 
+        // =========================================================
+        // GET ALL
+        // =========================================================
+
         @GetMapping
         public ResponseEntity<List<Score>> getAllScores() {
 
                 return ResponseEntity.ok(
                                 scoreService.getAllScores());
         }
+
+        // =========================================================
+        // GET SCORE BY MATCH
+        // =========================================================
 
         @GetMapping("/match/{id}")
         public ResponseEntity<Score> getScoreByMatch(
@@ -42,8 +54,14 @@ public class ScoreController {
 
                 return score
                                 .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build());
+                                .orElseGet(() -> ResponseEntity
+                                                .status(HttpStatus.NOT_FOUND)
+                                                .build());
         }
+
+        // =========================================================
+        // CREATE SCORE FOR MATCH
+        // =========================================================
 
         @PostMapping("/match/{matchId}")
         public ResponseEntity<Score> createScore(
@@ -53,8 +71,14 @@ public class ScoreController {
                 request.setMatchId(matchId);
 
                 return ResponseEntity.ok(
-                                scoreService.createScore(matchId, request));
+                                scoreService.createScore(
+                                                matchId,
+                                                request));
         }
+
+        // =========================================================
+        // UPDATE SCORE
+        // =========================================================
 
         @PutMapping("/{scoreId}")
         public ResponseEntity<Score> updateScore(
@@ -62,8 +86,14 @@ public class ScoreController {
                         @RequestBody ScoreRequest request) {
 
                 return ResponseEntity.ok(
-                                scoreService.updateScore(scoreId, request));
+                                scoreService.updateScore(
+                                                scoreId,
+                                                request));
         }
+
+        // =========================================================
+        // RECORD BALL
+        // =========================================================
 
         @PostMapping("/ball")
         public ResponseEntity<Score> recordBall(
@@ -73,6 +103,10 @@ public class ScoreController {
                                 scoreService.recordBall(request));
         }
 
+        // =========================================================
+        // UNDO
+        // =========================================================
+
         @PostMapping("/match/{matchId}/undo")
         public ResponseEntity<Score> undoLastBall(
                         @PathVariable Long matchId) {
@@ -81,19 +115,35 @@ public class ScoreController {
                                 scoreService.undoLastBall(matchId));
         }
 
+        // =========================================================
+        // START NEW INNINGS
+        // =========================================================
+
         @PostMapping("/match/{matchId}/start-innings")
         public ResponseEntity<Score> startInnings(
                         @PathVariable Long matchId) {
 
                 return ResponseEntity.ok(
-                                scoreService.resetForNewInnings(matchId));
+                                scoreService.resetForNewInnings(
+                                                matchId));
         }
 
+        // =========================================================
+        // DELETE
+        // =========================================================
+
         @DeleteMapping("/{scoreId}")
-        public ResponseEntity<Void> deleteScore(@PathVariable Long scoreId) {
+        public ResponseEntity<Void> deleteScore(
+                        @PathVariable Long scoreId) {
+
                 scoreService.deleteScore(scoreId);
+
                 return ResponseEntity.noContent().build();
         }
+
+        // =========================================================
+        // RESET
+        // =========================================================
 
         @PostMapping("/{scoreId}/reset")
         public ResponseEntity<Score> resetScore(
@@ -103,3 +153,107 @@ public class ScoreController {
                                 scoreService.resetScore(scoreId));
         }
 }
+// package mycric.controller;
+
+// import mycric.dto.ScoreRequest;
+// import mycric.entity.Score;
+// import mycric.service.ScoreService;
+
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.web.bind.annotation.*;
+
+// import java.util.List;
+// import java.util.Optional;
+
+// @RestController
+// @RequestMapping("/api/scores")
+// public class ScoreController {
+
+// @Autowired
+// private ScoreService scoreService;
+
+// @PostMapping
+// public ResponseEntity<Score> saveScore(
+// @RequestBody Score score) {
+
+// return ResponseEntity.ok(
+// scoreService.saveScore(score));
+// }
+
+// @GetMapping
+// public ResponseEntity<List<Score>> getAllScores() {
+
+// return ResponseEntity.ok(
+// scoreService.getAllScores());
+// }
+
+// @GetMapping("/match/{id}")
+// public ResponseEntity<Score> getScoreByMatch(
+// @PathVariable Long id) {
+
+// Optional<Score> score = scoreService.getScoreByMatch(id);
+
+// return score
+// .map(ResponseEntity::ok)
+// .orElse(ResponseEntity.notFound().build());
+// }
+
+// @PostMapping("/match/{matchId}")
+// public ResponseEntity<Score> createScore(
+// @PathVariable Long matchId,
+// @RequestBody ScoreRequest request) {
+
+// request.setMatchId(matchId);
+
+// return ResponseEntity.ok(
+// scoreService.createScore(matchId, request));
+// }
+
+// @PutMapping("/{scoreId}")
+// public ResponseEntity<Score> updateScore(
+// @PathVariable Long scoreId,
+// @RequestBody ScoreRequest request) {
+
+// return ResponseEntity.ok(
+// scoreService.updateScore(scoreId, request));
+// }
+
+// @PostMapping("/ball")
+// public ResponseEntity<Score> recordBall(
+// @RequestBody ScoreRequest request) {
+
+// return ResponseEntity.ok(
+// scoreService.recordBall(request));
+// }
+
+// @PostMapping("/match/{matchId}/undo")
+// public ResponseEntity<Score> undoLastBall(
+// @PathVariable Long matchId) {
+
+// return ResponseEntity.ok(
+// scoreService.undoLastBall(matchId));
+// }
+
+// @PostMapping("/match/{matchId}/start-innings")
+// public ResponseEntity<Score> startInnings(
+// @PathVariable Long matchId) {
+
+// return ResponseEntity.ok(
+// scoreService.resetForNewInnings(matchId));
+// }
+
+// @DeleteMapping("/{scoreId}")
+// public ResponseEntity<Void> deleteScore(@PathVariable Long scoreId) {
+// scoreService.deleteScore(scoreId);
+// return ResponseEntity.noContent().build();
+// }
+
+// @PostMapping("/{scoreId}/reset")
+// public ResponseEntity<Score> resetScore(
+// @PathVariable Long scoreId) {
+
+// return ResponseEntity.ok(
+// scoreService.resetScore(scoreId));
+// }
+// }

@@ -99,7 +99,6 @@ public class InningsController {
         // Frontend calls:
         // GET /api/innings/current/{matchId}
         // =========================================================
-
         @GetMapping("/current/{matchId}")
         public ResponseEntity<?> getCurrentInnings(
                         @PathVariable Long matchId) {
@@ -114,7 +113,8 @@ public class InningsController {
                         }
 
                         List<Innings> innings = inningsRepository
-                                        .findByMatch_IdOrderByInningsNumberAsc(matchId);
+                                        .findByMatch_IdOrderByInningsNumberAsc(
+                                                        matchId);
 
                         if (innings == null || innings.isEmpty()) {
 
@@ -123,34 +123,84 @@ public class InningsController {
                                                 .body("No innings found for this match");
                         }
 
-                        // First look for LIVE innings
+                        // Prefer LIVE innings
                         for (Innings inningsItem : innings) {
 
                                 if ("LIVE".equalsIgnoreCase(
                                                 inningsItem.getStatus())) {
 
-                                        return ResponseEntity.ok(inningsItem);
+                                        return ResponseEntity.ok(
+                                                        inningsItem);
                                 }
                         }
 
-                        // If no LIVE innings exists,
-                        // return the latest innings.
-                        Innings latest = innings.get(
-                                        innings.size() - 1);
-
-                        return ResponseEntity.ok(latest);
+                        // Otherwise latest innings
+                        return ResponseEntity.ok(
+                                        innings.get(innings.size() - 1));
 
                 } catch (Exception e) {
 
                         e.printStackTrace();
 
                         return ResponseEntity
-                                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .status(
+                                                        HttpStatus.INTERNAL_SERVER_ERROR)
                                         .body(
-                                                        "Unable to get current innings: "
+                                                        "Unable to load current innings: "
                                                                         + e.getMessage());
                 }
         }
+        // @GetMapping("/current/{matchId}")
+        // public ResponseEntity<?> getCurrentInnings(
+        // @PathVariable Long matchId) {
+
+        // try {
+
+        // if (!matchRepository.existsById(matchId)) {
+
+        // return ResponseEntity
+        // .status(HttpStatus.NOT_FOUND)
+        // .body("Match not found");
+        // }
+
+        // List<Innings> innings = inningsRepository
+        // .findByMatch_IdOrderByInningsNumberAsc(matchId);
+
+        // if (innings == null || innings.isEmpty()) {
+
+        // return ResponseEntity
+        // .status(HttpStatus.NOT_FOUND)
+        // .body("No innings found for this match");
+        // }
+
+        // // First look for LIVE innings
+        // for (Innings inningsItem : innings) {
+
+        // if ("LIVE".equalsIgnoreCase(
+        // inningsItem.getStatus())) {
+
+        // return ResponseEntity.ok(inningsItem);
+        // }
+        // }
+
+        // // If no LIVE innings exists,
+        // // return the latest innings.
+        // Innings latest = innings.get(
+        // innings.size() - 1);
+
+        // return ResponseEntity.ok(latest);
+
+        // } catch (Exception e) {
+
+        // e.printStackTrace();
+
+        // return ResponseEntity
+        // .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        // .body(
+        // "Unable to get current innings: "
+        // + e.getMessage());
+        // }
+        // }
 
         // =========================================================
         // CREATE INNINGS
