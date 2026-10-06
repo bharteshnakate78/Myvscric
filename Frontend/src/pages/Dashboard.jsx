@@ -249,7 +249,7 @@ function Dashboard() {
           <div>
             <div className="dashboard-eyebrow">
               <span className="dashboard-live-dot" />
-              CRICKET COMMAND CENTER
+              MYVSCRIC
             </div>
 
             <h1>

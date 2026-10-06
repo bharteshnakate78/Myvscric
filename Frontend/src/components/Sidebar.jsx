@@ -100,8 +100,8 @@ function Sidebar({ mobileOpen, setMobileOpen }) {
           </div>
 
           <div className="logo-text">
-            <strong>CRICKET</strong>
-            <span>COMMAND CENTER</span>
+            <strong>MYVS</strong>
+            <span>CRIC</span>
           </div>
 
           <button
