@@ -218,6 +218,565 @@ const formatOvers = (balls) => {
 
 export default function Scoreboard() {
   const navigate = useNavigate();
+  /* =========================================================
+   FULL CRICKET SCORECARD
+========================================================= */
+
+  const MatchScorecard = ({
+    history = [],
+    score,
+    selectedMatch,
+    strikerName,
+    nonStrikerName,
+  }) => {
+    const number = (value) => {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    const formatSR = (runs, balls) => {
+      const r = number(runs);
+      const b = number(balls);
+
+      return b > 0 ? ((r / b) * 100).toFixed(2) : "0.00";
+    };
+
+    const formatEconomy = (runs, balls) => {
+      const r = number(runs);
+      const b = number(balls);
+
+      return b > 0 ? (r / (b / 6)).toFixed(2) : "0.00";
+    };
+
+    const formatBowlerOvers = (balls) => {
+      const b = number(balls);
+
+      return `${Math.floor(b / 6)}.${b % 6}`;
+    };
+
+    const getWicketType = (ball) =>
+      String(ball?.wicketType || ball?.dismissalType || "WICKET").toUpperCase();
+
+    const getDismissalText = (ball) => {
+      if (!ball?.wicket) return "not out";
+
+      const type = getWicketType(ball);
+      const bowler = ball?.bowler || "—";
+      const description = String(ball?.description || "").trim();
+
+      switch (type) {
+        case "BOWLED":
+          return `b ${bowler}`;
+
+        case "CAUGHT":
+          return description
+            ? `c ${description} b ${bowler}`
+            : `c — b ${bowler}`;
+
+        case "STUMPED":
+          return description
+            ? `st ${description} b ${bowler}`
+            : `st — b ${bowler}`;
+
+        case "LBW":
+          return `lbw b ${bowler}`;
+
+        case "HIT_WICKET":
+          return `hit wicket b ${bowler}`;
+
+        case "RUN_OUT":
+          return description ? `run out (${description})` : "run out";
+
+        default:
+          return description
+            ? `${type.toLowerCase()} (${description})`
+            : `b ${bowler}`;
+      }
+    };
+
+    /* =======================================================
+     BATTING
+  ======================================================= */
+
+    const battingRows = useMemo(() => {
+      const map = new Map();
+
+      history.forEach((ball) => {
+        const batter = String(ball?.striker || "").trim();
+
+        if (!batter) return;
+
+        if (!map.has(batter)) {
+          map.set(batter, {
+            name: batter,
+            runs: 0,
+            balls: 0,
+            fours: 0,
+            sixes: 0,
+            wicket: false,
+            dismissal: "not out",
+          });
+        }
+
+        const row = map.get(batter);
+
+        const batsmanRuns = number(ball?.batsmanRuns);
+
+        const legalBall = Boolean(ball?.legalBall);
+
+        row.runs += batsmanRuns;
+
+        if (legalBall) {
+          row.balls += 1;
+        }
+
+        if (batsmanRuns === 4) {
+          row.fours += 1;
+        }
+
+        if (batsmanRuns === 6) {
+          row.sixes += 1;
+        }
+
+        if (ball?.wicket) {
+          row.wicket = true;
+          row.dismissal = getDismissalText(ball);
+        }
+      });
+
+      [strikerName, nonStrikerName].forEach((name) => {
+        const batter = String(name || "").trim();
+
+        if (!batter) return;
+
+        if (!map.has(batter)) {
+          map.set(batter, {
+            name: batter,
+            runs: 0,
+            balls: 0,
+            fours: 0,
+            sixes: 0,
+            wicket: false,
+            dismissal: "not out",
+          });
+        }
+      });
+
+      return Array.from(map.values());
+    }, [history, strikerName, nonStrikerName]);
+
+    /* =======================================================
+     EXTRAS
+  ======================================================= */
+
+    const extras = useMemo(() => {
+      let total = 0;
+      let wides = 0;
+      let noBalls = 0;
+      let byes = 0;
+      let legByes = 0;
+
+      history.forEach((ball) => {
+        const teamRuns = number(ball?.teamRuns);
+        const batsmanRuns = number(ball?.batsmanRuns);
+
+        const extraRuns = Math.max(0, teamRuns - batsmanRuns);
+
+        const label = String(ball?.label || "").toUpperCase();
+
+        total += extraRuns;
+
+        if (label.startsWith("WD")) {
+          wides += extraRuns;
+        } else if (label.startsWith("NB")) {
+          noBalls += Math.max(1, extraRuns);
+        } else if (label.includes("BYE") || label.startsWith("B")) {
+          byes += extraRuns;
+        } else if (label.includes("LEG") || label.startsWith("LB")) {
+          legByes += extraRuns;
+        }
+      });
+
+      return {
+        total,
+        wides,
+        noBalls,
+        byes,
+        legByes,
+      };
+    }, [history]);
+
+    /* =======================================================
+     BOWLING
+  ======================================================= */
+
+    const bowlingRows = useMemo(() => {
+      const map = new Map();
+
+      history.forEach((ball) => {
+        const bowler = String(ball?.bowler || "").trim();
+
+        if (!bowler) return;
+
+        if (!map.has(bowler)) {
+          map.set(bowler, {
+            name: bowler,
+            balls: 0,
+            runs: 0,
+            wickets: 0,
+            noBalls: 0,
+            wides: 0,
+            maidens: 0,
+          });
+        }
+
+        const row = map.get(bowler);
+
+        const teamRuns = number(ball?.teamRuns);
+
+        row.runs += teamRuns;
+
+        if (ball?.legalBall) {
+          row.balls += 1;
+        }
+
+        const label = String(ball?.label || "").toUpperCase();
+
+        if (label.startsWith("WD")) {
+          row.wides += Math.max(1, teamRuns);
+        }
+
+        if (label.startsWith("NB")) {
+          row.noBalls += 1;
+        }
+
+        /*
+         * Run out is not credited as a bowler wicket.
+         */
+        if (ball?.wicket && getWicketType(ball) !== "RUN_OUT") {
+          row.wickets += 1;
+        }
+      });
+
+      /*
+       * Maiden calculation per completed six-ball over.
+       */
+      const overMap = new Map();
+
+      history.forEach((ball) => {
+        if (!ball?.legalBall) return;
+
+        const bowler = String(ball?.bowler || "").trim();
+
+        if (!bowler) return;
+
+        const legalBefore = history
+          .slice(0, history.indexOf(ball))
+          .filter(
+            (item) =>
+              item?.legalBall && String(item?.bowler || "").trim() === bowler,
+          ).length;
+
+        const overNumber = Math.floor(legalBefore / 6);
+
+        const key = `${bowler}-${overNumber}`;
+
+        if (!overMap.has(key)) {
+          overMap.set(key, {
+            bowler,
+            overNumber,
+            balls: 0,
+            runs: 0,
+          });
+        }
+
+        const over = overMap.get(key);
+
+        over.balls += 1;
+        over.runs += number(ball?.teamRuns);
+      });
+
+      const rows = Array.from(map.values());
+
+      rows.forEach((row) => {
+        row.maidens = Array.from(overMap.values()).filter(
+          (over) =>
+            over.bowler === row.name && over.balls === 6 && over.runs === 0,
+        ).length;
+      });
+
+      return rows.map((row) => ({
+        ...row,
+        overs: formatBowlerOvers(row.balls),
+        economy: formatEconomy(row.runs, row.balls),
+      }));
+    }, [history]);
+
+    /* =======================================================
+     FALL OF WICKETS
+  ======================================================= */
+
+    const fallOfWickets = useMemo(() => {
+      const result = [];
+
+      let totalRuns = 0;
+      let legalBalls = 0;
+      let wicketNumber = 0;
+
+      history.forEach((ball) => {
+        totalRuns += number(ball?.teamRuns);
+
+        if (ball?.legalBall) {
+          legalBalls += 1;
+        }
+
+        if (ball?.wicket) {
+          wicketNumber += 1;
+
+          result.push({
+            number: wicketNumber,
+            batsman: ball?.striker || "Unknown",
+            score: `${totalRuns}-${wicketNumber}`,
+            over: `${Math.floor(legalBalls / 6)}.${legalBalls % 6}`,
+            bowler: ball?.bowler || "—",
+            dismissal: getDismissalText(ball),
+          });
+        }
+      });
+
+      return result;
+    }, [history]);
+
+    /* =======================================================
+     TEAM
+  ======================================================= */
+
+    const battingTeam =
+      score?.teamName || getTeamName(selectedMatch, 1) || "Batting Team";
+
+    return (
+      <section className="full-scorecard">
+        {/* HEADER */}
+
+        <div className="scorecard-title-row">
+          <div>
+            <span className="scorecard-eyebrow">MATCH SCORECARD</span>
+
+            <h3>{battingTeam}</h3>
+          </div>
+
+          <div className="scorecard-status">{score?.overs || "0.0"} OVERS</div>
+        </div>
+
+        {/* =================================================
+          BATTING
+      ================================================= */}
+
+        <div className="scorecard-table-section">
+          <div className="scorecard-table-heading">
+            <span>Batter</span>
+
+            <div className="scorecard-heading-stats">
+              <span>R</span>
+              <span>B</span>
+              <span>4s</span>
+              <span>6s</span>
+              <span>SR</span>
+            </div>
+          </div>
+
+          {battingRows.length === 0 ? (
+            <div className="scorecard-empty-row">No batting data yet</div>
+          ) : (
+            battingRows.map((batter) => {
+              const isCurrent =
+                batter.name === strikerName || batter.name === nonStrikerName;
+
+              return (
+                <div
+                  key={batter.name}
+                  className={`scorecard-batting-row ${
+                    batter.wicket ? "scorecard-dismissed" : ""
+                  }`}
+                >
+                  <div className="scorecard-batter-main">
+                    <div className="scorecard-batter-name">
+                      <strong>{batter.name}</strong>
+
+                      {isCurrent && !batter.wicket && (
+                        <span className="batting-now">●</span>
+                      )}
+                    </div>
+
+                    <div
+                      className={`scorecard-dismissal ${
+                        batter.wicket ? "dismissal-out" : ""
+                      }`}
+                    >
+                      {batter.dismissal}
+                    </div>
+                  </div>
+
+                  <div className="scorecard-batting-stats">
+                    <strong>{batter.runs}</strong>
+
+                    <span>{batter.balls}</span>
+
+                    <span>{batter.fours}</span>
+
+                    <span>{batter.sixes}</span>
+
+                    <span>{formatSR(batter.runs, batter.balls)}</span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+
+          {/* EXTRAS */}
+
+          <div className="scorecard-summary-row">
+            <strong>Extras</strong>
+
+            <span>
+              {extras.total} ( b {extras.byes}, lb {extras.legByes}, w{" "}
+              {extras.wides}, nb {extras.noBalls})
+            </span>
+          </div>
+
+          {/* TOTAL */}
+
+          <div className="scorecard-total-row">
+            <strong>Total</strong>
+
+            <strong>
+              {number(score?.runs)}-{number(score?.wickets)} (
+              {score?.overs || "0.0"})
+            </strong>
+          </div>
+
+          {/* DID NOT BAT */}
+
+          <div className="scorecard-did-not-bat">
+            <strong>Did not Bat</strong>
+
+            <span>No unused batting players loaded</span>
+          </div>
+        </div>
+
+        {/* =================================================
+          LAST WICKET
+      ================================================= */}
+
+        {fallOfWickets.length > 0 && (
+          <div className="scorecard-latest-wicket">
+            <div className="latest-wicket-left">
+              <span>LAST WICKET</span>
+
+              <strong>{fallOfWickets[fallOfWickets.length - 1].batsman}</strong>
+
+              <small>{fallOfWickets[fallOfWickets.length - 1].dismissal}</small>
+            </div>
+
+            <div className="latest-wicket-arrow">→</div>
+
+            <div className="latest-wicket-right">
+              <span>BOWLER</span>
+
+              <strong>{fallOfWickets[fallOfWickets.length - 1].bowler}</strong>
+
+              <small>Wicket delivery</small>
+            </div>
+          </div>
+        )}
+
+        {/* =================================================
+          BOWLING
+      ================================================= */}
+
+        <div className="scorecard-table-section">
+          <div className="scorecard-section-title">Bowling</div>
+
+          <div className="scorecard-bowling-heading">
+            <span>Bowler</span>
+
+            <div>
+              <span>O</span>
+              <span>M</span>
+              <span>R</span>
+              <span>W</span>
+              <span>NB</span>
+              <span>WD</span>
+              <span>ECO</span>
+            </div>
+          </div>
+
+          {bowlingRows.length === 0 ? (
+            <div className="scorecard-empty-row">No bowling data yet</div>
+          ) : (
+            bowlingRows.map((bowler) => (
+              <div key={bowler.name} className="scorecard-bowling-row">
+                <strong>{bowler.name}</strong>
+
+                <div>
+                  <span>{bowler.overs}</span>
+
+                  <span>{bowler.maidens}</span>
+
+                  <span>{bowler.runs}</span>
+
+                  <span className={bowler.wickets > 0 ? "bowler-wickets" : ""}>
+                    {bowler.wickets}
+                  </span>
+
+                  <span>{bowler.noBalls}</span>
+
+                  <span>{bowler.wides}</span>
+
+                  <span>{bowler.economy}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* =================================================
+          FALL OF WICKETS
+      ================================================= */}
+
+        <div className="scorecard-table-section">
+          <div className="scorecard-section-title">Fall of Wickets</div>
+
+          <div className="scorecard-fow-heading">
+            <span>Batsman</span>
+            <span>Score</span>
+            <span>Over</span>
+          </div>
+
+          {fallOfWickets.length === 0 ? (
+            <div className="scorecard-empty-row">No wickets yet</div>
+          ) : (
+            fallOfWickets.map((wicket) => (
+              <div
+                key={`${wicket.batsman}-${wicket.number}`}
+                className="scorecard-fow-row"
+              >
+                <div>
+                  <strong>{wicket.batsman}</strong>
+
+                  <small>{wicket.dismissal}</small>
+                </div>
+
+                <strong>{wicket.score}</strong>
+
+                <span>{wicket.over}</span>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+    );
+  };
 
   /* -------------------------------------------------------
      MATCH STATE
