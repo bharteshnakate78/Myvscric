@@ -6603,6 +6603,183 @@ button:disabled {
     display: none;
   }
 }
+  
+/* =========================================
+   CRICKET SCORECARD
+   ========================================= */
+
+.cricket-scorecard {
+  width: 100%;
+  margin: 20px 0;
+  overflow: hidden;
+  background: #ffffff;
+  color: #202124;
+  border: 1px solid #e0e5e9;
+  border-radius: 8px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+
+/* Green innings header */
+.cricket-scorecard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  background: #078f72;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cricket-scorecard-header strong:last-child {
+  white-space: nowrap;
+}
+
+/* Responsive table container */
+.cricket-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Shared table styles */
+.cricket-table {
+  width: 100%;
+  min-width: 390px;
+  border-collapse: collapse;
+  background: #ffffff;
+  text-align: center;
+}
+
+.cricket-table th {
+  padding: 8px 6px;
+  color: #3f4650;
+  background: #f4f6f8;
+  border-bottom: 1px solid #e3e7eb;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cricket-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 11px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.cricket-table th:first-child,
+.cricket-table td:first-child {
+  width: 40%;
+  min-width: 135px;
+  padding-left: 10px;
+  text-align: left;
+}
+
+/* Batter / bowler names */
+.cricket-table td:first-child strong {
+  color: #202124;
+  font-weight: 600;
+}
+
+.cricket-table td:first-child small {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+}
+
+/* Extras and yet-to-bat rows */
+.cricket-table .cricket-summary td {
+  background: #fbfcfd;
+  color: #424b57;
+}
+
+.cricket-table .cricket-summary td:first-child strong {
+  color: #202124;
+}
+
+/* Total score row */
+.cricket-table .cricket-total td {
+  background: #f0faf6;
+  border-top: 1px solid #d8eee5;
+  border-bottom: 1px solid #d8eee5;
+}
+
+.cricket-table .cricket-total td strong {
+  color: #08785f;
+}
+
+/* Bowling section heading */
+.cricket-bowling-title {
+  padding: 10px 12px;
+  background: #f4f6f8;
+  border-top: 1px solid #e0e5e9;
+  border-bottom: 1px solid #e0e5e9;
+  color: #202124;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Bowling table */
+.cricket-bowling-table {
+  min-width: 450px;
+}
+
+.cricket-bowling-table th:first-child,
+.cricket-bowling-table td:first-child {
+  width: 30%;
+  min-width: 120px;
+}
+
+/* Highlight current striker */
+.cricket-table tr.current-batter td:first-child strong {
+  color: #08785f;
+}
+
+/* Hover effect */
+.cricket-table tbody tr:hover td {
+  background-color: #f8fafb;
+}
+
+.cricket-table tbody tr.cricket-total:hover td {
+  background-color: #f0faf6;
+}
+
+/* Mobile screens */
+@media (max-width: 600px) {
+  .cricket-scorecard {
+    margin: 14px 0;
+    border-radius: 6px;
+    font-size: 11px;
+  }
+
+  .cricket-scorecard-header {
+    padding: 9px 10px;
+    font-size: 11px;
+  }
+
+  .cricket-table th,
+  .cricket-table td {
+    padding: 7px 5px;
+    font-size: 10px;
+  }
+
+  .cricket-table th:first-child,
+  .cricket-table td:first-child {
+    padding-left: 8px;
+  }
+
+  .cricket-bowling-title {
+    padding: 9px 10px;
+  }
+}
 `}</style>
     </div>
   );
