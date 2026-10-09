@@ -2355,6 +2355,77 @@ export default function Matches() {
 
         }
 
+        /* Cricbuzz-inspired match centre refresh */
+        .matches-page {
+          min-height: 100vh;
+          padding: 26px clamp(14px, 3vw, 42px) 42px;
+          color: #263238;
+          background: #f3f5f7;
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .page-header {
+          background: linear-gradient(110deg, #087f43, #07934c);
+          color: #fff;
+          padding: 26px 28px;
+          border-radius: 14px;
+          align-items: center;
+          margin-bottom: 22px;
+          box-shadow: 0 8px 24px rgba(4, 91, 47, .14);
+        }
+        .eyebrow, .modal-eyebrow { color: #c9f7d9; letter-spacing: .11em; }
+        .page-header h1 { color: #fff; font-size: clamp(27px, 3vw, 36px); letter-spacing: -.035em; }
+        .page-header p { color: rgba(255,255,255,.82); }
+        .refresh-btn { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.35); }
+        .refresh-btn:hover { background: rgba(255,255,255,.22); }
+        .primary-btn { background: #ffcc33; color: #263238; border: 1px solid #ffcc33; box-shadow: none; font-weight: 800; }
+        .primary-btn:hover { background: #ffd95f; transform: translateY(-1px); }
+        .stats-grid { gap: 14px; margin-bottom: 20px; }
+        .stat-card { background: #fff; color: #263238; border: 1px solid #e2e8e5; border-radius: 12px; box-shadow: 0 3px 12px rgba(21, 45, 34, .035); padding: 19px 20px; }
+        .stat-card span { color: #65736c; }
+        .stat-card strong { color: #172b21; }
+        .stat-icon { background: #e5f6ec; color: #078346; border-radius: 10px; }
+        .stat-icon.live { background: #ffeded; }
+        .stat-icon.live span { background: #e53935; box-shadow: 0 0 0 4px rgba(229,57,53,.12); }
+        .filter-card { background: #fff; border: 1px solid #e1e7e3; border-radius: 12px; box-shadow: 0 3px 12px rgba(21,45,34,.03); }
+        .search-box, .filter-card input, .filter-card select { background: #fff; color: #263238; border-color: #d9e2dc; }
+        .search-box input { color: #263238; }
+        .matches-card { background: #fff; border: 1px solid #e1e7e3; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 18px rgba(21,45,34,.04); }
+        .table-header { background: #f8faf9; border-bottom: 1px solid #e3e9e5; color: #263238; }
+        .table-header h2 { color: #24382d; }
+        .match-row { background: #fff; border-bottom: 1px solid #edf0ee; transition: background .18s ease; }
+        .match-row:hover { background: #f7fcf8; }
+        .match-info h3, .teams, .teams strong { color: #26372e; }
+        .tournament-name { color: #087f43; font-weight: 750; }
+        .date-info, .venue, .match-info p { color: #718078; }
+        .status { border-radius: 999px; font-weight: 800; }
+        .status.live { color: #c62828; background: #ffebee; }
+        .status.scheduled { color: #087f43; background: #e5f6ec; }
+        .status.completed { color: #58665e; background: #edf1ee; }
+        .icon-btn { background: #f4f7f5; color: #4d5c53; border: 1px solid #e0e7e2; }
+        .icon-btn:hover { background: #e6f5eb; color: #087f43; }
+        .icon-btn.danger:hover { background: #fff0f0; color: #c62828; }
+        .empty-state { color: #718078; }
+        .empty-icon { background: #e5f6ec; color: #087f43; }
+        .alert.error { background: #fff0f0; color: #a61d24; border-color: #ffd3d3; }
+        .alert.success { background: #e8f8ee; color: #087f43; border-color: #c8ecd5; }
+        .modal { background: #fff; color: #263238; border: 1px solid #e0e7e2; border-radius: 16px; }
+        .modal-header { border-bottom-color: #e8eeea; }
+        .modal-header h2, .form-group label { color: #26372e; }
+        .form-group input, .form-group select, .form-group textarea { background: #fff; color: #263238; border-color: #d7e0da; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #07934c; box-shadow: 0 0 0 3px rgba(7,147,76,.1); }
+        .team-box { background: #f8faf9; border-color: #e0e7e2; }
+        .vs-box { background: #e5f6ec; color: #087f43; }
+        .modal-footer { border-top-color: #e8eeea; }
+        .cancel-btn { background: #f3f6f4; color: #44534a; border-color: #dce5df; }
+        @media (max-width: 720px) {
+          .matches-page { padding: 14px 12px 28px; }
+          .page-header { align-items: flex-start; flex-direction: column; padding: 21px 18px; gap: 18px; }
+          .header-actions { width: 100%; flex-wrap: wrap; }
+          .header-actions button { flex: 1; justify-content: center; }
+          .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .stat-card { padding: 14px; gap: 10px; }
+        }
+
       `}</style>
     </div>
   );
@@ -2601,6 +2672,8 @@ export default function Matches() {
 //     team2Score: match.team2Score ?? "",
 
 //     result: match.result || "",
+
+//     winner: match.winner || "",
 
 //     toss: match.toss || "",
 //   };
@@ -3407,6 +3480,14 @@ export default function Matches() {
 
 //                   <span>{match.team2Name || "Team 2"}</span>
 //                 </div>
+
+//                 {String(match.status).toUpperCase() === "COMPLETED" &&
+//                   match.result && (
+//                     <div className="completed-result">
+//                       <Trophy size={14} />
+//                       <span>{match.result}</span>
+//                     </div>
+//                   )}
 //               </div>
 
 //               <div className="tournament-name">
@@ -4236,6 +4317,22 @@ export default function Matches() {
 //           color: #727b87;
 //           margin-top: 4px;
 //           font-size: 11px;
+//         }
+
+//         .completed-result {
+//           display: flex;
+//           align-items: center;
+//           gap: 6px;
+//           margin-top: 9px;
+//           color: #86efac;
+//           font-size: 12px;
+//           font-weight: 750;
+//           line-height: 1.35;
+//         }
+
+//         .completed-result svg {
+//           flex-shrink: 0;
+//           color: #4ade80;
 //         }
 
 //         /* STATUS */
