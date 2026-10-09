@@ -1307,6 +1307,11 @@ export default function Scoreboard() {
 
         ballType: label,
 
+        // Required by the backend to attribute career stats to registered players.
+        striker: strikerName.trim(),
+        nonStriker: nonStrikerName.trim(),
+        bowler: bowlerName.trim(),
+
         batsmanRuns: numericBatsmanRuns,
 
         wicketType: wicket ? wicketType : null,
@@ -7343,6 +7348,9 @@ button:disabled {
 
 //   const [matchResult, setMatchResult] = useState(null);
 //   const [firstInningsRuns, setFirstInningsRuns] = useState(null);
+//   const [superOverActive, setSuperOverActive] = useState(false);
+//   const [superOverInningsNumber, setSuperOverInningsNumber] = useState(0);
+//   const [superOverFirstRuns, setSuperOverFirstRuns] = useState(null);
 
 //   const [showCompletedMatchList, setShowCompletedMatchList] = useState(false);
 
@@ -7705,6 +7713,9 @@ button:disabled {
 //   ======================================================= */
 
 //   const handleAnotherMatch = () => {
+//     setSuperOverActive(false);
+//     setSuperOverInningsNumber(0);
+//     setSuperOverFirstRuns(null);
 //     setSelectedMatch(null);
 //     setMatchId("");
 //     resetScoreboardUI();
@@ -8692,14 +8703,10 @@ button:disabled {
 //     finalWickets = score.wickets,
 //   ) => {
 //     const team1 = getTeamName(selectedMatch, 1);
-
 //     const team2 = getTeamName(selectedMatch, 2);
-
 //     const runs = Number(finalRuns || 0);
 //     const wickets = Number(finalWickets || 0);
-
 //     const target = Number(score.target || 0);
-
 //     let firstScore =
 //       firstInningsRuns !== null ? Number(firstInningsRuns) : null;
 
@@ -8710,37 +8717,9 @@ button:disabled {
 //     ) {
 //       firstScore = Number(selectedMatch.team1Score);
 //     }
+//     if (firstScore === null && target > 0) firstScore = target - 1;
 
-//     if (firstScore === null && target > 0) {
-//       firstScore = target - 1;
-//     }
-
-//     if (target > 0 && runs >= target) {
-//       const wicketsRemaining = Math.max(0, 10 - wickets);
-
-//       return {
-//         winner: team2,
-//         winnerTeam: 2,
-//         result: `${team2} won by ${wicketsRemaining} wickets`,
-//         firstInningsScore: firstScore,
-//         secondInningsScore: runs,
-//         resultType: "WON_BY_WICKETS",
-//       };
-//     }
-
-//     if (firstScore !== null && target > 0 && runs < target) {
-//       const margin = Math.max(0, firstScore - runs);
-
-//       return {
-//         winner: team1,
-//         winnerTeam: 1,
-//         result: `${team1} won by ${margin} runs`,
-//         firstInningsScore: firstScore,
-//         secondInningsScore: runs,
-//         resultType: "WON_BY_RUNS",
-//       };
-//     }
-
+//     // Check a tie before the run/wicket win branches.
 //     if (firstScore !== null && runs === firstScore) {
 //       return {
 //         winner: null,
@@ -8749,6 +8728,28 @@ button:disabled {
 //         firstInningsScore: firstScore,
 //         secondInningsScore: runs,
 //         resultType: "TIED",
+//       };
+//     }
+
+//     if (target > 0 && runs >= target) {
+//       return {
+//         winner: team2,
+//         winnerTeam: 2,
+//         result: `${team2} won by ${Math.max(0, 10 - wickets)} wickets`,
+//         firstInningsScore: firstScore,
+//         secondInningsScore: runs,
+//         resultType: "WON_BY_WICKETS",
+//       };
+//     }
+
+//     if (firstScore !== null && target > 0 && runs < target) {
+//       return {
+//         winner: team1,
+//         winnerTeam: 1,
+//         result: `${team1} won by ${Math.max(0, firstScore - runs)} runs`,
+//         firstInningsScore: firstScore,
+//         secondInningsScore: runs,
+//         resultType: "WON_BY_RUNS",
 //       };
 //     }
 
@@ -8762,14 +8763,102 @@ button:disabled {
 //     };
 //   };
 
+//   const startSuperOver = async () => {
+//     if (!canUpdate || !matchId || !selectedMatch) {
+//       setError("You do not have permission or no match is selected.");
+//       return;
+//     }
+
+//     const team1Id = getTeamId(selectedMatch, 1);
+//     const team2Id = getTeamId(selectedMatch, 2);
+//     if (!team1Id || !team2Id) {
+//       setError("The selected match does not have both teams.");
+//       return;
+//     }
+
+//     try {
+//       setSaving(true);
+//       setError("");
+//       const newInningsNumber = superOverActive ? superOverInningsNumber + 1 : 3;
+//       const pairIndex = Math.floor((newInningsNumber - 3) / 2);
+//       const firstBattingSide = pairIndex % 2 === 0 ? 1 : 2;
+//       const battingSide =
+//         newInningsNumber % 2 === 1 ? firstBattingSide : 3 - firstBattingSide;
+//       const battingTeam = battingSide === 1 ? team1Id : team2Id;
+//       const bowlingTeam = battingSide === 1 ? team2Id : team1Id;
+//       const response = await inningsAPI.create({
+//         matchId: Number(matchId),
+//         inningsNumber: newInningsNumber,
+//         battingTeamId: Number(battingTeam),
+//         bowlingTeamId: Number(bowlingTeam),
+//         target: 0,
+//       });
+//       const inningsData = normalizeResponse(response);
+//       await scoreAPI.resetForNewInnings(Number(matchId));
+//       await matchAPI.update(
+//         matchId,
+//         buildMatchUpdatePayload(selectedMatch, {
+//           status: "LIVE",
+//           result: null,
+//         }),
+//       );
+
+//       setCurrentInningsId(inningsData?.id || null);
+//       setSuperOverActive(true);
+//       setSuperOverInningsNumber(newInningsNumber);
+//       setSuperOverFirstRuns(null);
+//       setScore({
+//         ...emptyScore,
+//         teamName: getTeamName(selectedMatch, battingSide),
+//       });
+//       setStrikerName("");
+//       setNonStrikerName("");
+//       setBowlerName("");
+//       setNextBowlerName("");
+//       setCurrentOverBalls([]);
+//       setHistory([]);
+//       setSelectedRuns(0);
+//       setInningsCompleted(false);
+//       setMatchCompleted(false);
+//       setMatchResult(null);
+//       setBowlerChangeRequired(false);
+//       setSelectedMatch((previous) => ({
+//         ...previous,
+//         status: "LIVE",
+//         result: null,
+//       }));
+//       setLastAction(
+//         `Super Over ${pairIndex + 1} started. ${getTeamName(selectedMatch, battingSide)} batting first.`,
+//       );
+//     } catch (err) {
+//       console.error("START SUPER OVER ERROR:", err);
+//       setError(
+//         err?.response?.data?.message ||
+//           err?.message ||
+//           "Unable to start Super Over. Check that the backend supports innings 3 and 4.",
+//       );
+//     } finally {
+//       setSaving(false);
+//     }
+//   };
+
 //   const startSecondInnings = async () => {
 //     if (!canUpdate) {
 //       setError("You do not have permission.");
 //       return;
 //     }
 
-//     const battingTeamId = getTeamId(selectedMatch, 2);
-//     const bowlingTeamId = getTeamId(selectedMatch, 1);
+//     const nextInningsNumber = superOverActive ? superOverInningsNumber + 1 : 2;
+//     let battingSide = 2;
+//     if (superOverActive) {
+//       const pairIndex = Math.floor((nextInningsNumber - 3) / 2);
+//       const firstBattingSide = pairIndex % 2 === 0 ? 1 : 2;
+//       battingSide =
+//         nextInningsNumber % 2 === 1 ? firstBattingSide : 3 - firstBattingSide;
+//     }
+//     const bowlingSide = 3 - battingSide;
+//     const battingTeamId = getTeamId(selectedMatch, battingSide);
+//     const bowlingTeamId = getTeamId(selectedMatch, bowlingSide);
 
 //     if (!matchId || !battingTeamId || !bowlingTeamId) {
 //       setError("The selected match does not have both teams.");
@@ -8781,7 +8870,8 @@ button:disabled {
 //       setError("");
 
 //       const firstRuns = Number(score.runs || 0);
-//       setFirstInningsRuns(firstRuns);
+//       if (superOverActive) setSuperOverFirstRuns(firstRuns);
+//       else setFirstInningsRuns(firstRuns);
 
 //       /*
 //        * Avoid creating innings 2 twice.
@@ -8800,7 +8890,9 @@ button:disabled {
 //             [];
 
 //         existingSecondInnings =
-//           inningsList.find((item) => Number(item?.inningsNumber) === 2) || null;
+//           inningsList.find(
+//             (item) => Number(item?.inningsNumber) === nextInningsNumber,
+//           ) || null;
 //       } catch (checkError) {
 //         console.log("No existing second innings found.");
 //       }
@@ -8810,7 +8902,7 @@ button:disabled {
 //       if (!inningsData) {
 //         const inningsResponse = await inningsAPI.create({
 //           matchId: Number(matchId),
-//           inningsNumber: 2,
+//           inningsNumber: nextInningsNumber,
 //           battingTeamId: Number(battingTeamId),
 //           bowlingTeamId: Number(bowlingTeamId),
 //           target: firstRuns + 1,
@@ -8832,7 +8924,7 @@ button:disabled {
 //         target: Number(
 //           inningsData?.target || inningsData?.targetRuns || firstRuns + 1,
 //         ),
-//         teamName: getTeamName(selectedMatch, 2),
+//         teamName: getTeamName(selectedMatch, battingSide),
 //       });
 
 //       setStrikerName("");
@@ -8847,10 +8939,11 @@ button:disabled {
 //       setInningsCompleted(false);
 //       setMatchCompleted(false);
 //       setMatchResult(null);
+//       if (superOverActive) setSuperOverInningsNumber(nextInningsNumber);
 //       setBowlerChangeRequired(false);
 
 //       setLastAction(
-//         `${getTeamName(selectedMatch, 2)} batting. Target: ${Number(
+//         `${superOverActive ? "Super Over: " : ""}${getTeamName(selectedMatch, battingSide)} batting. Target: ${Number(
 //           inningsData?.target || inningsData?.targetRuns || firstRuns + 1,
 //         )}.`,
 //       );
@@ -8886,17 +8979,63 @@ button:disabled {
 //       setSaving(true);
 //       setError("");
 
-//       const result = getFinalMatchResult(
-//         Number(score.runs || 0),
-//         Number(score.wickets || 0),
-//       );
+//       let result;
+//       if (superOverActive) {
+//         const firstSuperRuns = Number(superOverFirstRuns ?? 0);
+//         const secondSuperRuns = Number(score.runs || 0);
+//         if (firstSuperRuns === secondSuperRuns) {
+//           result = {
+//             winner: null,
+//             winnerTeam: null,
+//             result: "Super Over Tied — another Super Over is required",
+//             firstInningsScore: Number(
+//               selectedMatch?.team1Score ?? firstInningsRuns ?? 0,
+//             ),
+//             secondInningsScore: Number(
+//               selectedMatch?.team2Score ?? score.runs ?? 0,
+//             ),
+//             resultType: "SUPER_OVER_TIED",
+//           };
+//         } else {
+//           // The team batting first alternates for each new Super Over pair.
+//           const superOverPairIndex = Math.floor(
+//             (superOverInningsNumber - 3) / 2,
+//           );
+//           const firstBattingTeam = superOverPairIndex % 2 === 0 ? 1 : 2;
+//           const secondBattingTeam = 3 - firstBattingTeam;
+//           const winnerTeam =
+//             firstSuperRuns > secondSuperRuns
+//               ? firstBattingTeam
+//               : secondBattingTeam;
+//           const winner = getTeamName(selectedMatch, winnerTeam);
+//           result = {
+//             winner,
+//             winnerTeam,
+//             result: `${winner} won the Super Over`,
+//             firstInningsScore: Number(
+//               selectedMatch?.team1Score ?? firstInningsRuns ?? 0,
+//             ),
+//             secondInningsScore: Number(selectedMatch?.team2Score ?? 0),
+//             resultType: "SUPER_OVER_WIN",
+//           };
+//         }
+//       } else {
+//         result = getFinalMatchResult(
+//           Number(score.runs || 0),
+//           Number(score.wickets || 0),
+//         );
+//       }
 
 //       await matchAPI.update(
 //         matchId,
 //         buildMatchUpdatePayload(selectedMatch, {
 //           status: "COMPLETED",
-//           team1Score: result.firstInningsScore,
-//           team2Score: result.secondInningsScore,
+//           team1Score: superOverActive
+//             ? selectedMatch?.team1Score
+//             : result.firstInningsScore,
+//           team2Score: superOverActive
+//             ? selectedMatch?.team2Score
+//             : result.secondInningsScore,
 //           result: result.result,
 //         }),
 //       );
@@ -8908,8 +9047,12 @@ button:disabled {
 //       setSelectedMatch((previous) => ({
 //         ...previous,
 //         status: "COMPLETED",
-//         team1Score: result.firstInningsScore,
-//         team2Score: result.secondInningsScore,
+//         team1Score: superOverActive
+//           ? previous.team1Score
+//           : result.firstInningsScore,
+//         team2Score: superOverActive
+//           ? previous.team2Score
+//           : result.secondInningsScore,
 //         result: result.result,
 //         winner: result.winner,
 //       }));
@@ -9239,6 +9382,41 @@ button:disabled {
 //                 </section>
 //               )}
 
+//               {matchCompleted &&
+//                 matchResult?.resultType === "TIED" &&
+//                 !superOverActive && (
+//                   <section className="match-controls-card">
+//                     <p>
+//                       The match is tied. Start a Super Over to decide the
+//                       winner.
+//                     </p>
+//                     <button
+//                       className="primary-action-button"
+//                       onClick={startSuperOver}
+//                       disabled={saving}
+//                     >
+//                       <Zap size={16} /> Start Super Over
+//                     </button>
+//                   </section>
+//                 )}
+
+//               {matchCompleted &&
+//                 matchResult?.resultType === "SUPER_OVER_TIED" && (
+//                   <section className="match-controls-card">
+//                     <p>
+//                       The Super Over is tied. Start another Super Over to decide
+//                       the winner.
+//                     </p>
+//                     <button
+//                       className="primary-action-button"
+//                       onClick={startSuperOver}
+//                       disabled={saving}
+//                     >
+//                       <Zap size={16} /> Start Another Super Over
+//                     </button>
+//                   </section>
+//                 )}
+
 //               {matchCompleted && matchResult && (
 //                 <section className="final-score-card">
 //                   <div className="final-score-team">
@@ -9263,6 +9441,7 @@ button:disabled {
 //                 <div className="score-hero-top">
 //                   <div>
 //                     <span className="eyebrow">
+//                       {superOverActive ? "SUPER OVER · " : ""}
 //                       {score.teamName || getTeamName(selectedMatch, 1)}
 //                     </span>
 
@@ -9895,7 +10074,9 @@ button:disabled {
 //                     disabled={saving || inningsCompleted}
 //                   >
 //                     <Flag size={16} />
-//                     End First Innings
+//                     {superOverActive
+//                       ? `End Super Over Innings ${superOverInningsNumber % 2 === 1 ? "1" : "2"}`
+//                       : "End First Innings"}
 //                   </button>
 
 //                   {inningsCompleted && !matchCompleted && (
@@ -9905,7 +10086,9 @@ button:disabled {
 //                       disabled={saving}
 //                     >
 //                       <Play size={16} />
-//                       Start Second Innings
+//                       {superOverActive
+//                         ? "Start Super Over Innings 2"
+//                         : "Start Second Innings"}
 //                     </button>
 //                   )}
 
@@ -13023,6 +13206,33 @@ button:disabled {
 // //   return `${getTeamName(match, 1)} vs ${getTeamName(match, 2)}`;
 // // };
 
+// // const getWinnerFromMatch = (match) => {
+// //   if (match?.winner) return match.winner;
+
+// //   const result = String(match?.result || "").trim();
+
+// //   const winnerMatch = result.match(/^(.*?)\s+won by\s+/i);
+
+// //   return winnerMatch?.[1]?.trim() || null;
+// // };
+
+// // const buildMatchUpdatePayload = (match, overrides = {}) => ({
+// //   name: match?.name || getMatchName(match),
+// //   tournamentId: getTournamentId(match) ? Number(getTournamentId(match)) : null,
+// //   teamAId: getTeamId(match, 1) ? Number(getTeamId(match, 1)) : null,
+// //   teamBId: getTeamId(match, 2) ? Number(getTeamId(match, 2)) : null,
+// //   matchDate: match?.matchDate || null,
+// //   time: match?.time || null,
+// //   venue: match?.venue || null,
+// //   matchType: match?.matchType || null,
+// //   overs: match?.overs ?? null,
+// //   status: overrides.status ?? match?.status ?? "SCHEDULED",
+// //   team1Score: overrides.team1Score ?? match?.team1Score ?? null,
+// //   team2Score: overrides.team2Score ?? match?.team2Score ?? null,
+// //   result: overrides.result ?? match?.result ?? null,
+// //   toss: match?.toss || null,
+// // });
+
 // // const normalizeMatch = (match) => ({
 // //   ...match,
 // //   tournamentId: getTournamentId(match),
@@ -13057,6 +13267,565 @@ button:disabled {
 
 // // export default function Scoreboard() {
 // //   const navigate = useNavigate();
+// //   /* =========================================================
+// //    FULL CRICKET SCORECARD
+// // ========================================================= */
+
+// //   const MatchScorecard = ({
+// //     history = [],
+// //     score,
+// //     selectedMatch,
+// //     strikerName,
+// //     nonStrikerName,
+// //   }) => {
+// //     const number = (value) => {
+// //       const n = Number(value);
+// //       return Number.isFinite(n) ? n : 0;
+// //     };
+
+// //     const formatSR = (runs, balls) => {
+// //       const r = number(runs);
+// //       const b = number(balls);
+
+// //       return b > 0 ? ((r / b) * 100).toFixed(2) : "0.00";
+// //     };
+
+// //     const formatEconomy = (runs, balls) => {
+// //       const r = number(runs);
+// //       const b = number(balls);
+
+// //       return b > 0 ? (r / (b / 6)).toFixed(2) : "0.00";
+// //     };
+
+// //     const formatBowlerOvers = (balls) => {
+// //       const b = number(balls);
+
+// //       return `${Math.floor(b / 6)}.${b % 6}`;
+// //     };
+
+// //     const getWicketType = (ball) =>
+// //       String(ball?.wicketType || ball?.dismissalType || "WICKET").toUpperCase();
+
+// //     const getDismissalText = (ball) => {
+// //       if (!ball?.wicket) return "not out";
+
+// //       const type = getWicketType(ball);
+// //       const bowler = ball?.bowler || "—";
+// //       const description = String(ball?.description || "").trim();
+
+// //       switch (type) {
+// //         case "BOWLED":
+// //           return `b ${bowler}`;
+
+// //         case "CAUGHT":
+// //           return description
+// //             ? `c ${description} b ${bowler}`
+// //             : `c — b ${bowler}`;
+
+// //         case "STUMPED":
+// //           return description
+// //             ? `st ${description} b ${bowler}`
+// //             : `st — b ${bowler}`;
+
+// //         case "LBW":
+// //           return `lbw b ${bowler}`;
+
+// //         case "HIT_WICKET":
+// //           return `hit wicket b ${bowler}`;
+
+// //         case "RUN_OUT":
+// //           return description ? `run out (${description})` : "run out";
+
+// //         default:
+// //           return description
+// //             ? `${type.toLowerCase()} (${description})`
+// //             : `b ${bowler}`;
+// //       }
+// //     };
+
+// //     /* =======================================================
+// //      BATTING
+// //   ======================================================= */
+
+// //     const battingRows = useMemo(() => {
+// //       const map = new Map();
+
+// //       history.forEach((ball) => {
+// //         const batter = String(ball?.striker || "").trim();
+
+// //         if (!batter) return;
+
+// //         if (!map.has(batter)) {
+// //           map.set(batter, {
+// //             name: batter,
+// //             runs: 0,
+// //             balls: 0,
+// //             fours: 0,
+// //             sixes: 0,
+// //             wicket: false,
+// //             dismissal: "not out",
+// //           });
+// //         }
+
+// //         const row = map.get(batter);
+
+// //         const batsmanRuns = number(ball?.batsmanRuns);
+
+// //         const legalBall = Boolean(ball?.legalBall);
+
+// //         row.runs += batsmanRuns;
+
+// //         if (legalBall) {
+// //           row.balls += 1;
+// //         }
+
+// //         if (batsmanRuns === 4) {
+// //           row.fours += 1;
+// //         }
+
+// //         if (batsmanRuns === 6) {
+// //           row.sixes += 1;
+// //         }
+
+// //         if (ball?.wicket) {
+// //           row.wicket = true;
+// //           row.dismissal = getDismissalText(ball);
+// //         }
+// //       });
+
+// //       [strikerName, nonStrikerName].forEach((name) => {
+// //         const batter = String(name || "").trim();
+
+// //         if (!batter) return;
+
+// //         if (!map.has(batter)) {
+// //           map.set(batter, {
+// //             name: batter,
+// //             runs: 0,
+// //             balls: 0,
+// //             fours: 0,
+// //             sixes: 0,
+// //             wicket: false,
+// //             dismissal: "not out",
+// //           });
+// //         }
+// //       });
+
+// //       return Array.from(map.values());
+// //     }, [history, strikerName, nonStrikerName]);
+
+// //     /* =======================================================
+// //      EXTRAS
+// //   ======================================================= */
+
+// //     const extras = useMemo(() => {
+// //       let total = 0;
+// //       let wides = 0;
+// //       let noBalls = 0;
+// //       let byes = 0;
+// //       let legByes = 0;
+
+// //       history.forEach((ball) => {
+// //         const teamRuns = number(ball?.teamRuns);
+// //         const batsmanRuns = number(ball?.batsmanRuns);
+
+// //         const extraRuns = Math.max(0, teamRuns - batsmanRuns);
+
+// //         const label = String(ball?.label || "").toUpperCase();
+
+// //         total += extraRuns;
+
+// //         if (label.startsWith("WD")) {
+// //           wides += extraRuns;
+// //         } else if (label.startsWith("NB")) {
+// //           noBalls += Math.max(1, extraRuns);
+// //         } else if (label.includes("BYE") || label.startsWith("B")) {
+// //           byes += extraRuns;
+// //         } else if (label.includes("LEG") || label.startsWith("LB")) {
+// //           legByes += extraRuns;
+// //         }
+// //       });
+
+// //       return {
+// //         total,
+// //         wides,
+// //         noBalls,
+// //         byes,
+// //         legByes,
+// //       };
+// //     }, [history]);
+
+// //     /* =======================================================
+// //      BOWLING
+// //   ======================================================= */
+
+// //     const bowlingRows = useMemo(() => {
+// //       const map = new Map();
+
+// //       history.forEach((ball) => {
+// //         const bowler = String(ball?.bowler || "").trim();
+
+// //         if (!bowler) return;
+
+// //         if (!map.has(bowler)) {
+// //           map.set(bowler, {
+// //             name: bowler,
+// //             balls: 0,
+// //             runs: 0,
+// //             wickets: 0,
+// //             noBalls: 0,
+// //             wides: 0,
+// //             maidens: 0,
+// //           });
+// //         }
+
+// //         const row = map.get(bowler);
+
+// //         const teamRuns = number(ball?.teamRuns);
+
+// //         row.runs += teamRuns;
+
+// //         if (ball?.legalBall) {
+// //           row.balls += 1;
+// //         }
+
+// //         const label = String(ball?.label || "").toUpperCase();
+
+// //         if (label.startsWith("WD")) {
+// //           row.wides += Math.max(1, teamRuns);
+// //         }
+
+// //         if (label.startsWith("NB")) {
+// //           row.noBalls += 1;
+// //         }
+
+// //         /*
+// //          * Run out is not credited as a bowler wicket.
+// //          */
+// //         if (ball?.wicket && getWicketType(ball) !== "RUN_OUT") {
+// //           row.wickets += 1;
+// //         }
+// //       });
+
+// //       /*
+// //        * Maiden calculation per completed six-ball over.
+// //        */
+// //       const overMap = new Map();
+
+// //       history.forEach((ball) => {
+// //         if (!ball?.legalBall) return;
+
+// //         const bowler = String(ball?.bowler || "").trim();
+
+// //         if (!bowler) return;
+
+// //         const legalBefore = history
+// //           .slice(0, history.indexOf(ball))
+// //           .filter(
+// //             (item) =>
+// //               item?.legalBall && String(item?.bowler || "").trim() === bowler,
+// //           ).length;
+
+// //         const overNumber = Math.floor(legalBefore / 6);
+
+// //         const key = `${bowler}-${overNumber}`;
+
+// //         if (!overMap.has(key)) {
+// //           overMap.set(key, {
+// //             bowler,
+// //             overNumber,
+// //             balls: 0,
+// //             runs: 0,
+// //           });
+// //         }
+
+// //         const over = overMap.get(key);
+
+// //         over.balls += 1;
+// //         over.runs += number(ball?.teamRuns);
+// //       });
+
+// //       const rows = Array.from(map.values());
+
+// //       rows.forEach((row) => {
+// //         row.maidens = Array.from(overMap.values()).filter(
+// //           (over) =>
+// //             over.bowler === row.name && over.balls === 6 && over.runs === 0,
+// //         ).length;
+// //       });
+
+// //       return rows.map((row) => ({
+// //         ...row,
+// //         overs: formatBowlerOvers(row.balls),
+// //         economy: formatEconomy(row.runs, row.balls),
+// //       }));
+// //     }, [history]);
+
+// //     /* =======================================================
+// //      FALL OF WICKETS
+// //   ======================================================= */
+
+// //     const fallOfWickets = useMemo(() => {
+// //       const result = [];
+
+// //       let totalRuns = 0;
+// //       let legalBalls = 0;
+// //       let wicketNumber = 0;
+
+// //       history.forEach((ball) => {
+// //         totalRuns += number(ball?.teamRuns);
+
+// //         if (ball?.legalBall) {
+// //           legalBalls += 1;
+// //         }
+
+// //         if (ball?.wicket) {
+// //           wicketNumber += 1;
+
+// //           result.push({
+// //             number: wicketNumber,
+// //             batsman: ball?.striker || "Unknown",
+// //             score: `${totalRuns}-${wicketNumber}`,
+// //             over: `${Math.floor(legalBalls / 6)}.${legalBalls % 6}`,
+// //             bowler: ball?.bowler || "—",
+// //             dismissal: getDismissalText(ball),
+// //           });
+// //         }
+// //       });
+
+// //       return result;
+// //     }, [history]);
+
+// //     /* =======================================================
+// //      TEAM
+// //   ======================================================= */
+
+// //     const battingTeam =
+// //       score?.teamName || getTeamName(selectedMatch, 1) || "Batting Team";
+
+// //     return (
+// //       <section className="full-scorecard">
+// //         {/* HEADER */}
+
+// //         <div className="scorecard-title-row">
+// //           <div>
+// //             <span className="scorecard-eyebrow">MATCH SCORECARD</span>
+
+// //             <h3>{battingTeam}</h3>
+// //           </div>
+
+// //           <div className="scorecard-status">{score?.overs || "0.0"} OVERS</div>
+// //         </div>
+
+// //         {/* =================================================
+// //           BATTING
+// //       ================================================= */}
+
+// //         <div className="scorecard-table-section">
+// //           <div className="scorecard-table-heading">
+// //             <span>Batter</span>
+
+// //             <div className="scorecard-heading-stats">
+// //               <span>R</span>
+// //               <span>B</span>
+// //               <span>4s</span>
+// //               <span>6s</span>
+// //               <span>SR</span>
+// //             </div>
+// //           </div>
+
+// //           {battingRows.length === 0 ? (
+// //             <div className="scorecard-empty-row">No batting data yet</div>
+// //           ) : (
+// //             battingRows.map((batter) => {
+// //               const isCurrent =
+// //                 batter.name === strikerName || batter.name === nonStrikerName;
+
+// //               return (
+// //                 <div
+// //                   key={batter.name}
+// //                   className={`scorecard-batting-row ${
+// //                     batter.wicket ? "scorecard-dismissed" : ""
+// //                   }`}
+// //                 >
+// //                   <div className="scorecard-batter-main">
+// //                     <div className="scorecard-batter-name">
+// //                       <strong>{batter.name}</strong>
+
+// //                       {isCurrent && !batter.wicket && (
+// //                         <span className="batting-now">●</span>
+// //                       )}
+// //                     </div>
+
+// //                     <div
+// //                       className={`scorecard-dismissal ${
+// //                         batter.wicket ? "dismissal-out" : ""
+// //                       }`}
+// //                     >
+// //                       {batter.dismissal}
+// //                     </div>
+// //                   </div>
+
+// //                   <div className="scorecard-batting-stats">
+// //                     <strong>{batter.runs}</strong>
+
+// //                     <span>{batter.balls}</span>
+
+// //                     <span>{batter.fours}</span>
+
+// //                     <span>{batter.sixes}</span>
+
+// //                     <span>{formatSR(batter.runs, batter.balls)}</span>
+// //                   </div>
+// //                 </div>
+// //               );
+// //             })
+// //           )}
+
+// //           {/* EXTRAS */}
+
+// //           <div className="scorecard-summary-row">
+// //             <strong>Extras</strong>
+
+// //             <span>
+// //               {extras.total} ( b {extras.byes}, lb {extras.legByes}, w{" "}
+// //               {extras.wides}, nb {extras.noBalls})
+// //             </span>
+// //           </div>
+
+// //           {/* TOTAL */}
+
+// //           <div className="scorecard-total-row">
+// //             <strong>Total</strong>
+
+// //             <strong>
+// //               {number(score?.runs)}-{number(score?.wickets)} (
+// //               {score?.overs || "0.0"})
+// //             </strong>
+// //           </div>
+
+// //           {/* DID NOT BAT */}
+
+// //           <div className="scorecard-did-not-bat">
+// //             <strong>Did not Bat</strong>
+
+// //             <span>No unused batting players loaded</span>
+// //           </div>
+// //         </div>
+
+// //         {/* =================================================
+// //           LAST WICKET
+// //       ================================================= */}
+
+// //         {fallOfWickets.length > 0 && (
+// //           <div className="scorecard-latest-wicket">
+// //             <div className="latest-wicket-left">
+// //               <span>LAST WICKET</span>
+
+// //               <strong>{fallOfWickets[fallOfWickets.length - 1].batsman}</strong>
+
+// //               <small>{fallOfWickets[fallOfWickets.length - 1].dismissal}</small>
+// //             </div>
+
+// //             <div className="latest-wicket-arrow">→</div>
+
+// //             <div className="latest-wicket-right">
+// //               <span>BOWLER</span>
+
+// //               <strong>{fallOfWickets[fallOfWickets.length - 1].bowler}</strong>
+
+// //               <small>Wicket delivery</small>
+// //             </div>
+// //           </div>
+// //         )}
+
+// //         {/* =================================================
+// //           BOWLING
+// //       ================================================= */}
+
+// //         <div className="scorecard-table-section">
+// //           <div className="scorecard-section-title">Bowling</div>
+
+// //           <div className="scorecard-bowling-heading">
+// //             <span>Bowler</span>
+
+// //             <div>
+// //               <span>O</span>
+// //               <span>M</span>
+// //               <span>R</span>
+// //               <span>W</span>
+// //               <span>NB</span>
+// //               <span>WD</span>
+// //               <span>ECO</span>
+// //             </div>
+// //           </div>
+
+// //           {bowlingRows.length === 0 ? (
+// //             <div className="scorecard-empty-row">No bowling data yet</div>
+// //           ) : (
+// //             bowlingRows.map((bowler) => (
+// //               <div key={bowler.name} className="scorecard-bowling-row">
+// //                 <strong>{bowler.name}</strong>
+
+// //                 <div>
+// //                   <span>{bowler.overs}</span>
+
+// //                   <span>{bowler.maidens}</span>
+
+// //                   <span>{bowler.runs}</span>
+
+// //                   <span className={bowler.wickets > 0 ? "bowler-wickets" : ""}>
+// //                     {bowler.wickets}
+// //                   </span>
+
+// //                   <span>{bowler.noBalls}</span>
+
+// //                   <span>{bowler.wides}</span>
+
+// //                   <span>{bowler.economy}</span>
+// //                 </div>
+// //               </div>
+// //             ))
+// //           )}
+// //         </div>
+
+// //         {/* =================================================
+// //           FALL OF WICKETS
+// //       ================================================= */}
+
+// //         <div className="scorecard-table-section">
+// //           <div className="scorecard-section-title">Fall of Wickets</div>
+
+// //           <div className="scorecard-fow-heading">
+// //             <span>Batsman</span>
+// //             <span>Score</span>
+// //             <span>Over</span>
+// //           </div>
+
+// //           {fallOfWickets.length === 0 ? (
+// //             <div className="scorecard-empty-row">No wickets yet</div>
+// //           ) : (
+// //             fallOfWickets.map((wicket) => (
+// //               <div
+// //                 key={`${wicket.batsman}-${wicket.number}`}
+// //                 className="scorecard-fow-row"
+// //               >
+// //                 <div>
+// //                   <strong>{wicket.batsman}</strong>
+
+// //                   <small>{wicket.dismissal}</small>
+// //                 </div>
+
+// //                 <strong>{wicket.score}</strong>
+
+// //                 <span>{wicket.over}</span>
+// //               </div>
+// //             ))
+// //           )}
+// //         </div>
+// //       </section>
+// //     );
+// //   };
 
 // //   /* -------------------------------------------------------
 // //      MATCH STATE
@@ -13069,7 +13838,7 @@ button:disabled {
 // //   const [matchId, setMatchId] = useState("");
 // //   const [currentInningsId, setCurrentInningsId] = useState(null);
 
-// //   const [loading, setLoading] = useState(true);
+// //   const [loading, setLoading] = useState(false);
 // //   const [saving, setSaving] = useState(false);
 
 // //   const [error, setError] = useState("");
@@ -13261,90 +14030,100 @@ button:disabled {
 
 // //       resetScoreboardUI();
 
-// //       /* CURRENT SCORE */
-
-// //       try {
-// //         const scoreResponse = await scoreAPI.getCurrent(id);
-
-// //         const scoreData = normalizeResponse(scoreResponse);
-
-// //         if (scoreData && Object.keys(scoreData).length > 0) {
-// //           const balls = getBallCount(scoreData?.overs);
-
-// //           setScore({
-// //             ...emptyScore,
-// //             ...scoreData,
-// //             balls,
-// //             overs: scoreData?.overs || formatOvers(balls),
-// //             striker: {
-// //               ...emptyBatsman,
-// //               ...(scoreData?.striker || {}),
-// //             },
-// //             nonStriker: {
-// //               ...emptyBatsman,
-// //               ...(scoreData?.nonStriker || {}),
-// //             },
-// //             bowler: {
-// //               ...emptyBowler,
-// //               ...(scoreData?.bowler || {}),
-// //             },
-// //           });
-
-// //           setStrikerName(scoreData?.striker?.name || "");
-// //           setNonStrikerName(scoreData?.nonStriker?.name || "");
-// //           setBowlerName(scoreData?.bowler?.name || "");
-// //         }
-// //       } catch (err) {
-// //         console.log("No current score yet.");
-// //       }
-
-// //       /* CURRENT INNINGS */
-
-// //       try {
-// //         const inningsResponse = await inningsAPI.getCurrent(id);
-
-// //         const inningsPayload = normalizeResponse(inningsResponse);
-// //         const inningsData = Array.isArray(inningsPayload)
-// //           ? inningsPayload[inningsPayload.length - 1]
-// //           : inningsPayload?.data || inningsPayload;
-
-// //         if (inningsData) {
-// //           setCurrentInningsId(inningsData?.id || null);
-// //           const inningsRuns = Number(
-// //             inningsData?.runs ||
-// //               inningsData?.totalRuns ||
-// //               inningsData?.score ||
-// //               0,
-// //           );
-
-// //           const inningsWickets = Number(
-// //             inningsData?.wickets || inningsData?.totalWickets || 0,
-// //           );
-
-// //           const inningsOvers =
-// //             inningsData?.overs || formatOvers(getBallCount(inningsData?.overs));
-
-// //           const inningsBalls = getBallCount(inningsOvers);
-
-// //           setScore((prev) => ({
-// //             ...prev,
-// //             runs: inningsRuns || prev.runs,
-// //             wickets: inningsWickets || prev.wickets,
-// //             balls: inningsBalls || prev.balls,
-// //             overs: inningsOvers || prev.overs,
-// //             teamName:
-// //               inningsData?.battingTeam?.name ||
-// //               inningsData?.teamName ||
-// //               prev.teamName,
-// //             target:
-// //               inningsData?.target || inningsData?.targetRuns || prev.target,
-// //           }));
-// //         }
-// //       } catch (err) {
-// //         console.log("No innings data yet.");
-// //       }
-
 // //       const status = getMatchStatus(match);
+// //       const shouldLoadScoreData = [
+// //         "LIVE",
+// //         "COMPLETED",
+// //         "INNINGS_COMPLETED",
+// //       ].includes(status);
+
+// //       /* CURRENT SCORE / INNINGS
+// //        *
+// //        * Scheduled matches normally do not have score data yet.
+// //        * Do not call the backend endpoints in that state because
+// //        * they correctly return 404 when no score/innings exists.
+// //        */
+// //       if (shouldLoadScoreData) {
+// //         try {
+// //           const scoreResponse = await scoreAPI.getCurrent(id);
+
+// //           const scoreData = normalizeResponse(scoreResponse);
+
+// //           if (scoreData && Object.keys(scoreData).length > 0) {
+// //             const balls = getBallCount(scoreData?.overs);
+
+// //             setScore({
+// //               ...emptyScore,
+// //               ...scoreData,
+// //               balls,
+// //               overs: scoreData?.overs || formatOvers(balls),
+// //               striker: {
+// //                 ...emptyBatsman,
+// //                 ...(scoreData?.striker || {}),
+// //               },
+// //               nonStriker: {
+// //                 ...emptyBatsman,
+// //                 ...(scoreData?.nonStriker || {}),
+// //               },
+// //               bowler: {
+// //                 ...emptyBowler,
+// //                 ...(scoreData?.bowler || {}),
+// //               },
+// //             });
+
+// //             setStrikerName(scoreData?.striker?.name || "");
+// //             setNonStrikerName(scoreData?.nonStriker?.name || "");
+// //             setBowlerName(scoreData?.bowler?.name || "");
+// //           }
+// //         } catch (err) {
+// //           console.log("No current score yet.");
+// //         }
+
+// //         try {
+// //           const inningsResponse = await inningsAPI.getCurrent(id);
+
+// //           const inningsPayload = normalizeResponse(inningsResponse);
+// //           const inningsData = Array.isArray(inningsPayload)
+// //             ? inningsPayload[inningsPayload.length - 1]
+// //             : inningsPayload?.data || inningsPayload;
+
+// //           if (inningsData) {
+// //             setCurrentInningsId(inningsData?.id || null);
+// //             const inningsRuns = Number(
+// //               inningsData?.runs ||
+// //                 inningsData?.totalRuns ||
+// //                 inningsData?.score ||
+// //                 0,
+// //             );
+
+// //             const inningsWickets = Number(
+// //               inningsData?.wickets || inningsData?.totalWickets || 0,
+// //             );
+
+// //             const inningsOvers =
+// //               inningsData?.overs ||
+// //               formatOvers(getBallCount(inningsData?.overs));
+
+// //             const inningsBalls = getBallCount(inningsOvers);
+
+// //             setScore((prev) => ({
+// //               ...prev,
+// //               runs: inningsRuns || prev.runs,
+// //               wickets: inningsWickets || prev.wickets,
+// //               balls: inningsBalls || prev.balls,
+// //               overs: inningsOvers || prev.overs,
+// //               teamName:
+// //                 inningsData?.battingTeam?.name ||
+// //                 inningsData?.teamName ||
+// //                 prev.teamName,
+// //               target:
+// //                 inningsData?.target || inningsData?.targetRuns || prev.target,
+// //             }));
+// //           }
+// //         } catch (err) {
+// //           console.log("No innings data yet.");
+// //         }
+// //       }
 
 // //       const completed = status === "COMPLETED";
 
@@ -13354,7 +14133,7 @@ button:disabled {
 
 // //       if (completed) {
 // //         setMatchResult({
-// //           winner: match?.winner || null,
+// //           winner: getWinnerFromMatch(match),
 // //           result: match?.result || "Match completed",
 // //           firstInningsScore: match?.team1Score ?? match?.team1Runs ?? null,
 // //           secondInningsScore: match?.team2Score ?? match?.team2Runs ?? null,
@@ -13775,14 +14554,15 @@ button:disabled {
 // //         setLastAction(result.result);
 
 // //         try {
-// //           await matchAPI.update(matchId, {
-// //             ...selectedMatch,
-// //             status: "COMPLETED",
-// //             team1Score: result.firstInningsScore,
-// //             team2Score: result.secondInningsScore,
-// //             result: result.result,
-// //             winner: result.winner,
-// //           });
+// //           await matchAPI.update(
+// //             matchId,
+// //             buildMatchUpdatePayload(selectedMatch, {
+// //               status: "COMPLETED",
+// //               team1Score: result.firstInningsScore,
+// //               team2Score: result.secondInningsScore,
+// //               result: result.result,
+// //             }),
+// //           );
 
 // //           setSelectedMatch((previous) => ({
 // //             ...previous,
@@ -14537,25 +15317,24 @@ button:disabled {
 // //       let existingSecondInnings = null;
 
 // //       try {
-// //         const currentResponse = await inningsAPI.getCurrent(Number(matchId));
-// //         const currentData = normalizeResponse(currentResponse);
+// //         const allInningsResponse = await inningsAPI.getByMatch(Number(matchId));
+// //         const allInnings = normalizeResponse(allInningsResponse);
+// //         const inningsList = Array.isArray(allInnings)
+// //           ? allInnings
+// //           : allInnings?.data ||
+// //             allInnings?.content ||
+// //             allInnings?.innings ||
+// //             [];
 
-// //         if (Array.isArray(currentData)) {
-// //           existingSecondInnings =
-// //             currentData.find((item) => Number(item?.inningsNumber) === 2) ||
-// //             currentData.find(
-// //               (item) => String(item?.status || "").toUpperCase() === "LIVE",
-// //             );
-// //         } else {
-// //           existingSecondInnings = currentData?.data || currentData;
-// //         }
+// //         existingSecondInnings =
+// //           inningsList.find((item) => Number(item?.inningsNumber) === 2) || null;
 // //       } catch (checkError) {
 // //         console.log("No existing second innings found.");
 // //       }
 
 // //       let inningsData = existingSecondInnings;
 
-// //       if (!inningsData || Number(inningsData?.inningsNumber) !== 2) {
+// //       if (!inningsData) {
 // //         const inningsResponse = await inningsAPI.create({
 // //           matchId: Number(matchId),
 // //           inningsNumber: 2,
@@ -14639,14 +15418,15 @@ button:disabled {
 // //         Number(score.wickets || 0),
 // //       );
 
-// //       await matchAPI.update(matchId, {
-// //         ...selectedMatch,
-// //         status: "COMPLETED",
-// //         team1Score: result.firstInningsScore,
-// //         team2Score: result.secondInningsScore,
-// //         result: result.result,
-// //         winner: result.winner,
-// //       });
+// //       await matchAPI.update(
+// //         matchId,
+// //         buildMatchUpdatePayload(selectedMatch, {
+// //           status: "COMPLETED",
+// //           team1Score: result.firstInningsScore,
+// //           team2Score: result.secondInningsScore,
+// //           result: result.result,
+// //         }),
+// //       );
 
 // //       setMatchResult(result);
 // //       setMatchCompleted(true);
