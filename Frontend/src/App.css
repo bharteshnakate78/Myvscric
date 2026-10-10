@@ -562,90 +562,676 @@
     transform: rotate(90deg);
   }
 }
-/* ===== MATCH SCORECARD ===== */
-.full-scorecard {
-  width: 100%;
-  margin: 22px 0;
-  padding: 24px;
-  color: #e8edf5;
-  background: linear-gradient(145deg, #111925, #0b111a);
-  border: 1px solid #273244;
-  border-radius: 18px;
+/* =========================================
+   MYVSCRIC — SCOREBOARD PAGE
+   Add to Frontend/src/App.css
+========================================= */
+
+.scoreboard-page {
+  --sb-bg: #0b1220;
+  --sb-card: #111c2d;
+  --sb-inner: #0c1625;
+  --sb-border: #27364b;
+  --sb-text: #f1f5fb;
+  --sb-muted: #94a4ba;
+  --sb-green: #20c878;
+  --sb-blue: #48a9ff;
+
+  min-height: 100vh;
+  padding: 26px;
+  color: var(--sb-text);
+  background: var(--sb-bg);
   box-sizing: border-box;
+}
+
+.scoreboard-page *,
+.scoreboard-page *::before,
+.scoreboard-page *::after {
+  box-sizing: border-box;
+}
+
+.scoreboard-content {
+  width: 100%;
+  max-width: 1450px;
+  margin: 0 auto;
+}
+
+.scoreboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.page-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--sb-text);
+  font-size: 23px;
+  font-weight: 850;
+}
+
+.brand-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  color: white;
+  background: linear-gradient(135deg, #16a765, #087d4b);
+  border-radius: 14px;
+}
+
+.back-button,
+.primary-action-button,
+.secondary-action-button,
+.complete-button,
+.undo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 1px solid var(--sb-border);
+  border-radius: 10px;
+  color: var(--sb-text);
+  background: #18263a;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.back-button:hover,
+.secondary-action-button:hover,
+.undo-button:hover {
+  background: #26374e;
+}
+
+.primary-action-button {
+  color: #06170e;
+  background: var(--sb-green);
+  border-color: var(--sb-green);
+}
+
+.primary-action-button:hover {
+  background: #3ae091;
+}
+
+.complete-button {
+  color: #fff;
+  background: #b4233c;
+  border-color: #d23b53;
+}
+
+.undo-button:disabled,
+.primary-action-button:disabled,
+.secondary-action-button:disabled,
+.complete-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Shared cards */
+
+.match-selector-card,
+.match-controls-card,
+.score-hero,
+.player-card,
+.scoring-card,
+.history-card,
+.full-scorecard,
+.current-over-card,
+.start-match-card,
+.new-bowler-card,
+.manual-exception-panel,
+.empty-scoreboard-card,
+.loading-card {
+  margin-bottom: 22px;
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 26px rgb(0 0 0 / 12%);
+}
+
+.match-selector-card,
+.match-controls-card {
+  padding: 22px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: var(--sb-text);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.eyebrow,
+.scorecard-eyebrow {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--sb-blue);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+.match-select-wrapper {
+  width: 100%;
+}
+
+.match-select-wrapper select,
+.scoreboard-page input,
+.scoreboard-page select,
+.scoreboard-page textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 13px;
+  color: var(--sb-text);
+  background: var(--sb-inner);
+  border: 1px solid #35465d;
+  border-radius: 9px;
+  outline: none;
+}
+
+.scoreboard-page input:focus,
+.scoreboard-page select:focus,
+.scoreboard-page textarea:focus {
+  border-color: var(--sb-blue);
+  box-shadow: 0 0 0 3px rgb(72 169 255 / 12%);
+}
+
+.scoreboard-page option {
+  color: var(--sb-text);
+  background: var(--sb-card);
+}
+
+/* Score hero */
+
+.score-hero {
+  position: relative;
+  padding: 28px;
   overflow: hidden;
-  font-family: Inter, Arial, sans-serif;
+  background:
+    radial-gradient(ellipse at top right, rgb(32 200 120 / 13%), transparent 55%),
+    linear-gradient(135deg, #15253a, #101a2a);
+}
+
+.score-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.score-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--sb-muted);
+  font-size: 13px;
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  color: #63e6a0;
+  background: rgb(32 200 120 / 12%);
+  border: 1px solid rgb(32 200 120 / 30%);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.live-indicator::before {
+  width: 7px;
+  height: 7px;
+  background: #20d780;
+  border-radius: 50%;
+  content: "";
+}
+
+.score-hero h1,
+.score-hero h2 {
+  margin: 0 0 12px;
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+.score-hero h1 {
+  font-size: clamp(32px, 5vw, 54px);
+}
+
+.score-hero h2 {
+  font-size: clamp(25px, 4vw, 38px);
+}
+
+.target-box {
+  padding: 14px 18px;
+  color: #dceaff;
+  background: rgb(72 169 255 / 10%);
+  border: 1px solid rgb(72 169 255 / 25%);
+  border-radius: 12px;
+}
+
+.target-box strong {
+  display: block;
+  margin-top: 5px;
+  color: #fff;
+  font-size: 21px;
+}
+
+.completed-result-banner {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  margin-top: 18px;
+  color: #b9f7d6;
+  background: rgb(32 200 120 / 10%);
+  border: 1px solid rgb(32 200 120 / 25%);
+  border-radius: 12px;
+}
+
+.completed-result-content {
+  flex: 1;
+}
+
+.completed-result-label {
+  margin-bottom: 5px;
+  color: var(--sb-green);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 1px;
+}
+
+.completed-result-icon {
+  color: var(--sb-green);
+}
+
+/* Players */
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.player-card {
+  min-width: 0;
+  padding: 22px;
+  margin-bottom: 0;
+}
+
+.player-card.striker-card {
+  border-color: rgb(32 200 120 / 50%);
+  background: linear-gradient(145deg, #142b2a, #111c2d 65%);
+}
+
+.player-card.bowler-card {
+  background: linear-gradient(145deg, #1a2038, #111c2d 65%);
+}
+
+.player-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.player-role {
+  color: var(--sb-muted);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+.role-badge {
+  padding: 6px 9px;
+  color: #6ce4a5;
+  background: rgb(32 200 120 / 12%);
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.player-name {
+  overflow-wrap: anywhere;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 850;
+}
+
+.player-mini-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.player-stat {
+  padding: 12px 8px;
+  text-align: center;
+  background: var(--sb-inner);
+  border: 1px solid #26364b;
+  border-radius: 10px;
+}
+
+.player-stat strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #fff;
+  font-size: 20px;
+}
+
+.player-stat span {
+  color: var(--sb-muted);
+  font-size: 11px;
+}
+
+/* Scoring controls */
+
+.scoring-card {
+  padding: 25px;
+}
+
+.scoring-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.scoring-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 21px;
+}
+
+.run-buttons {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.run-button {
+  display: grid;
+  place-items: center;
+  min-height: 62px;
+  color: #edf4ff;
+  background: #1a2a40;
+  border: 1px solid #354861;
+  border-radius: 12px;
+  font-size: 21px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.run-button:hover {
+  color: white;
+  background: #244566;
+  border-color: var(--sb-blue);
+  transform: translateY(-2px);
+}
+
+.run-button.selected-run {
+  color: #062113;
+  background: var(--sb-green);
+  border-color: var(--sb-green);
+}
+
+.run-button.dot {
+  color: #bdcbe0;
+}
+
+.special-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.special-button {
+  min-height: 48px;
+  padding: 12px;
+  color: #f5f8ff;
+  background: #202e42;
+  border: 1px solid #394a61;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.special-button.wide {
+  color: #f8d87c;
+  background: #392f1b;
+  border-color: #6a5529;
+}
+
+.special-button.no-ball {
+  color: #ffbf87;
+  background: #3b281d;
+  border-color: #70442b;
+}
+
+.special-button.wicket {
+  color: #ffb0bb;
+  background: #3b202b;
+  border-color: #753345;
+}
+
+.special-button:hover {
+  filter: brightness(1.2);
+}
+
+.batting-dot {
+  color: var(--sb-green);
+  font-weight: 900;
+}
+
+/* Current over */
+
+.current-over-card {
+  padding: 25px;
+}
+
+.current-over-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.current-over-header h3 {
+  margin: 5px 0 0;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 850;
+}
+
+.over-number {
+  padding: 10px 14px;
+  color: #cbbcff;
+  background: #282344;
+  border: 1px solid #49406d;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.current-over-balls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 75px;
+  padding: 18px;
+  background: var(--sb-inner);
+  border: 1px dashed #35455a;
+  border-radius: 12px;
+}
+
+.history-ball,
+.ball-result {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  color: #e7f0ff;
+  background: #1c2d43;
+  border: 1px solid #3a4d65;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.ball-wicket-mark {
+  color: #ff9eac;
+}
+
+.history-ball:has(.ball-wicket-mark) {
+  background: #812b3b;
+  border-color: #cf5366;
+}
+
+.over-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 16px;
+  color: var(--sb-muted);
+  font-size: 12px;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  background: #7890aa;
+  border-radius: 50%;
+}
+
+.legend-dot.legal {
+  background: var(--sb-green);
+}
+
+.legend-dot.extra {
+  background: #f2bd58;
+}
+
+.legend-dot.wicket {
+  background: #ed6176;
+}
+
+.empty-over {
+  width: 100%;
+  color: var(--sb-muted);
+  text-align: center;
+}
+
+/* Scorecard */
+
+.full-scorecard {
+  padding: 25px;
+  overflow: hidden;
 }
 
 .scorecard-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 22px;
-  border-bottom: 1px solid #293444;
-}
-
-.scorecard-eyebrow {
-  display: block;
-  margin-bottom: 12px;
-  color: #8a98ad;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1.8px;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--sb-border);
 }
 
 .scorecard-title-row h3 {
   margin: 0;
-  color: #f5f7fb;
+  color: #fff;
   font-size: 24px;
-  font-weight: 800;
 }
 
 .scorecard-status {
-  padding: 10px 14px;
-  color: #71d7a1;
-  background: #10291f;
-  border: 1px solid #24533d;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 800;
-  white-space: nowrap;
+  padding: 8px 12px;
+  color: #6ce4a5;
+  background: #153126;
+  border: 1px solid #28553e;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 850;
 }
 
-/* ===== BATTING & BOWLING SECTIONS ===== */
 .scorecard-table-section {
   margin-top: 22px;
-  overflow: hidden;
-  background: #0d141e;
-  border: 1px solid #273244;
+  overflow-x: auto;
+  background: var(--sb-inner);
+  border: 1px solid var(--sb-border);
   border-radius: 12px;
 }
 
+.scorecard-section-title {
+  padding: 16px 18px;
+  color: #fff;
+  background: #19283b;
+  border-bottom: 1px solid var(--sb-border);
+  font-size: 16px;
+  font-weight: 850;
+}
+
 .scorecard-table-heading,
-.scorecard-batting-row,
-.scorecard-summary-row,
-.scorecard-total-row,
-.scorecard-did-not-bat,
-.scorecard-bowling-heading,
-.scorecard-bowling-row {
+.scorecard-batting-row {
   display: grid;
+  grid-template-columns: minmax(125px, 1fr) minmax(220px, 1.2fr);
   align-items: center;
   gap: 12px;
-  padding: 15px 18px;
+  min-width: 410px;
+  padding: 14px 18px;
 }
 
 .scorecard-table-heading {
-  grid-template-columns: minmax(130px, 1fr) minmax(220px, 1fr);
-  color: #a7b4c7;
-  background: #182333;
-  font-size: 12px;
-  font-weight: 800;
+  color: var(--sb-muted);
+  background: #19283b;
+  font-size: 11px;
+  font-weight: 850;
 }
 
 .scorecard-heading-stats,
-.scorecard-batting-stats,
-.scorecard-bowling-heading > div,
-.scorecard-bowling-row > div {
+.scorecard-batting-stats {
   display: grid;
   grid-template-columns: repeat(5, minmax(24px, 1fr));
   gap: 8px;
@@ -653,8 +1239,9 @@
 }
 
 .scorecard-batting-row {
-  grid-template-columns: minmax(130px, 1fr) minmax(220px, 1fr);
-  border-bottom: 1px solid #202b3a;
+  color: #dce5f1;
+  border-bottom: 1px solid #263347;
+  font-size: 13px;
 }
 
 .scorecard-batter-main {
@@ -662,155 +1249,130 @@
 }
 
 .scorecard-batter-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #f2f5fa;
-  font-size: 14px;
-}
-
-.batting-now {
-  color: #42d392;
-  font-size: 10px;
+  color: #fff;
+  font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .scorecard-dismissal {
+  display: block;
   margin-top: 5px;
-  color: #8795aa;
-  font-size: 12px;
+  color: var(--sb-muted);
+  font-size: 11px;
   line-height: 1.5;
 }
 
-.scorecard-dismissal.dismissal-out {
-  color: #e99a9a;
-}
-
-.scorecard-batting-stats {
-  color: #d7dfeb;
-  font-size: 13px;
+.batting-now {
+  margin-left: 5px;
+  color: var(--sb-green);
+  font-size: 10px;
 }
 
 .scorecard-batting-stats strong {
   color: #fff;
-  font-size: 15px;
 }
 
 .scorecard-summary-row,
 .scorecard-total-row,
 .scorecard-did-not-bat {
-  grid-template-columns: minmax(100px, 0.7fr) 2fr;
-  border-top: 1px solid #202b3a;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--sb-border);
   font-size: 13px;
 }
 
-.scorecard-summary-row {
-  color: #bac5d5;
+.scorecard-summary-row,
+.scorecard-did-not-bat {
+  color: #b8c6d9;
 }
 
 .scorecard-total-row {
-  color: #f6f8fc;
-  background: #172435;
-  font-size: 14px;
+  color: #fff;
+  background: #19283b;
+  font-weight: 850;
 }
 
 .scorecard-total-row strong:last-child {
-  text-align: right;
-  color: #70d7a2;
+  color: var(--sb-green);
   font-size: 17px;
 }
 
-.scorecard-did-not-bat {
-  color: #b8c4d5;
-}
-
-.scorecard-did-not-bat span {
-  color: #8290a5;
-}
-
-.scorecard-section-title {
-  padding: 18px;
-  color: #f0f4fb;
-  font-size: 16px;
-  font-weight: 800;
-  border-bottom: 1px solid #273244;
+.scorecard-bowling-heading,
+.scorecard-bowling-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) minmax(280px, 2fr);
+  align-items: center;
+  gap: 12px;
+  min-width: 410px;
+  padding: 14px 18px;
 }
 
 .scorecard-bowling-heading {
-  grid-template-columns: minmax(110px, 1fr) minmax(280px, 2fr);
-  color: #a7b4c7;
-  background: #182333;
-  font-size: 12px;
-  font-weight: 800;
+  color: var(--sb-muted);
+  background: #19283b;
+  font-size: 11px;
+  font-weight: 850;
 }
 
 .scorecard-bowling-heading > div,
 .scorecard-bowling-row > div {
+  display: grid;
   grid-template-columns: repeat(7, minmax(20px, 1fr));
+  gap: 6px;
+  text-align: right;
 }
 
 .scorecard-bowling-row {
-  grid-template-columns: minmax(110px, 1fr) minmax(280px, 2fr);
-  border-bottom: 1px solid #202b3a;
-  color: #d7dfeb;
-  font-size: 13px;
+  color: #dce5f1;
+  border-bottom: 1px solid #263347;
+  font-size: 12px;
 }
 
 .scorecard-bowling-row > strong {
-  color: #f2f5fa;
+  color: #fff;
 }
 
 .bowler-wickets {
-  color: #6fdb9e;
-  font-weight: 800;
+  color: var(--sb-green);
+  font-weight: 850;
 }
 
-.scorecard-empty-row {
-  padding: 25px 18px;
-  color: #8190a6;
-  text-align: center;
-  font-size: 13px;
-  background: #101824;
-}
-
-/* ===== FALL OF WICKETS ===== */
 .scorecard-fow-heading,
 .scorecard-fow-row {
   display: grid;
-  grid-template-columns: minmax(140px, 2fr) 1fr 1fr;
-  align-items: center;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 12px;
-  padding: 14px 18px;
+  align-items: center;
+  min-width: 350px;
+  padding: 13px 18px;
 }
 
 .scorecard-fow-heading {
-  color: #a7b4c7;
-  background: #182333;
-  font-size: 12px;
-  font-weight: 800;
+  color: var(--sb-muted);
+  background: #19283b;
+  font-size: 11px;
+  font-weight: 850;
 }
 
 .scorecard-fow-row {
-  color: #dce4ef;
-  border-bottom: 1px solid #202b3a;
-  font-size: 13px;
+  color: #dce5f1;
+  border-bottom: 1px solid #263347;
+  font-size: 12px;
 }
 
-.scorecard-fow-row small {
-  display: block;
-  margin-top: 5px;
-  color: #8998ad;
-}
-
-/* ===== LAST WICKET ===== */
 .scorecard-latest-wicket {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 18px;
   margin-top: 18px;
   padding: 20px;
-  background: #121d2b;
-  border: 1px solid #2b394c;
+  background: #0d1827;
+  border: 1px solid var(--sb-border);
   border-radius: 12px;
 }
 
@@ -820,263 +1382,436 @@
   flex: 1;
   flex-direction: column;
   gap: 7px;
-  min-width: 0;
+  min-width: 120px;
 }
 
 .latest-wicket-left span,
 .latest-wicket-right span {
-  color: #8d9bb0;
+  color: var(--sb-muted);
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 850;
   letter-spacing: 1px;
 }
 
 .latest-wicket-left strong,
 .latest-wicket-right strong {
-  color: #f5f7fb;
+  color: #fff;
   overflow-wrap: anywhere;
 }
 
-.latest-wicket-left small,
-.latest-wicket-right small {
-  color: #98a6b9;
-}
-
 .latest-wicket-arrow {
-  color: #6cd69a;
-  font-size: 24px;
+  color: #f26e83;
+  font-size: 22px;
 }
 
-/* ===== CURRENT OVER / BALL BY BALL ===== */
-.current-over-card {
-  margin: 24px 0;
-  padding: 28px;
-  color: #edf2fa;
-  background: linear-gradient(145deg, #111925, #0b111a);
-  border: 1px solid #273244;
-  border-radius: 20px;
-  box-sizing: border-box;
+.scorecard-empty-row {
+  padding: 22px;
+  color: var(--sb-muted);
+  text-align: center;
 }
 
-.current-over-header {
+/* History */
+
+.history-card {
+  padding: 24px;
+}
+
+.history-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 28px;
-}
-
-.current-over-header .eyebrow {
-  color: #65caff;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-
-.current-over-header h3 {
-  margin: 12px 0 0;
-  color: #f6f8fc;
-  font-size: 22px;
-  font-weight: 800;
-}
-
-.over-number {
-  padding: 11px 15px;
-  color: #c5b7ff;
-  background: #24223d;
-  border: 1px solid #403966;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.current-over-balls {
-  display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 12px;
-  min-height: 76px;
-  padding: 20px;
-  background: #0d141e;
-  border: 1px dashed #303d50;
-  border-radius: 16px;
+  margin-bottom: 18px;
 }
 
-.ball-result {
-  position: relative;
+.history-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 20px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 45px;
-  height: 45px;
-  color: #e8f0fb;
-  background: #1b293a;
-  border: 1px solid #35465c;
-  border-radius: 50%;
-  font-size: 14px;
-  font-weight: 800;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  background: var(--sb-inner);
+  border: 1px solid #25354a;
+  border-radius: 10px;
 }
 
-.ball-result:has(strong) {
-  flex-shrink: 0;
+.history-info {
+  color: #dce5f1;
+  font-size: 13px;
 }
 
-.ball-result.ball-wicket {
-  color: #fff;
-  background: #a92e40;
-  border-color: #e45465;
+.history-runs {
+  color: var(--sb-green);
+  font-weight: 850;
 }
 
-.ball-result.ball-extra {
-  color: #f6d78a;
-  background: #3a301b;
-  border-color: #79612e;
+.last-action {
+  margin-top: 16px;
+  color: var(--sb-muted);
+  font-size: 12px;
 }
 
-.ball-wicket-mark {
-  position: absolute;
-  top: -7px;
-  right: -6px;
+.empty-history,
+.empty-scoreboard-card {
+  padding: 30px;
+  color: var(--sb-muted);
+  text-align: center;
+}
+
+.empty-icon {
+  margin-bottom: 12px;
+  color: #6c829e;
+}
+
+/* Forms and innings controls */
+
+.start-match-card,
+.new-bowler-card,
+.manual-exception-panel {
+  padding: 24px;
+}
+
+.start-match-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.start-match-icon,
+.new-bowler-icon {
   display: grid;
   place-items: center;
-  width: 19px;
-  height: 19px;
-  color: white;
-  background: #e34d5d;
-  border-radius: 50%;
-  font-size: 10px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  color: var(--sb-green);
+  background: rgb(32 200 120 / 12%);
+  border-radius: 12px;
 }
 
-.empty-over {
-  width: 100%;
-  padding: 12px;
-  color: #7f8da3;
-  text-align: center;
+.start-match-content h3,
+.new-bowler-text h3 {
+  margin: 0 0 7px;
+  color: #fff;
+}
+
+.start-match-content p,
+.new-bowler-text p {
+  margin: 0;
+  color: var(--sb-muted);
   font-size: 13px;
-  font-weight: 600;
+  line-height: 1.6;
 }
 
-.over-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  margin-top: 18px;
-  color: #9ba9bd;
-  font-size: 12px;
+.new-bowler-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 14px;
+  margin-top: 20px;
 }
 
-.over-legend > span {
+.manual-exception-toggle {
   display: flex;
   align-items: center;
-  gap: 7px;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  color: #fff;
+  background: #19283b;
+  border: 1px solid var(--sb-border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 750;
 }
 
-.legend-dot {
-  width: 8px;
-  height: 8px;
-  background: #53657c;
+.manual-exception-wrapper {
+  margin-top: 14px;
+}
+
+.exception-header {
+  margin-bottom: 18px;
+  color: #fff;
+  font-weight: 850;
+}
+
+.exception-section {
+  margin-bottom: 18px;
+}
+
+.exception-input-grid,
+.exception-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.exception-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #c8d4e4;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.exception-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #dce5f1;
+  font-size: 13px;
+}
+
+.exception-checkbox input {
+  width: 17px;
+  min-height: 17px;
+}
+
+.exception-preview {
+  padding: 14px;
+  color: #cfe7ff;
+  background: #10243a;
+  border: 1px solid #294764;
+  border-radius: 10px;
+}
+
+.quick-exception {
+  min-height: 42px;
+  padding: 10px;
+  color: #dce8f8;
+  background: #1b2c42;
+  border: 1px solid #354961;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.quick-exception.danger {
+  color: #ffb3bd;
+  background: #3b202b;
+  border-color: #743547;
+}
+
+.quick-exception.runout {
+  color: #ffd38e;
+  background: #392c1b;
+  border-color: #68502c;
+}
+
+.record-exception-button {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 15px;
+  color: #fff;
+  background: #b52f47;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+/* Messages and loading */
+
+.error-banner,
+.selection-required-message {
+  padding: 15px 18px;
+  margin-bottom: 18px;
+  color: #ffb9c1;
+  background: #351c27;
+  border: 1px solid #6f3444;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.loading-card {
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 15px;
+  border: 3px solid #304258;
+  border-top-color: var(--sb-green);
   border-radius: 50%;
+  animation: scoreboard-spin 0.8s linear infinite;
 }
 
-.legend-dot.legal {
-  background: #4bd49a;
+.loading-overlay {
+  position: relative;
+  opacity: 0.6;
+  pointer-events: none;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 700px) {
+@keyframes scoreboard-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+
+@media (max-width: 1000px) {
+  .players-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .player-card.bowler-card {
+    grid-column: 1 / -1;
+  }
+
+  .run-buttons {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .scoreboard-page {
+    padding: 13px;
+  }
+
+  .scoreboard-header {
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+
+  .page-brand {
+    font-size: 19px;
+  }
+
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .header-left,
+  .header-right {
+    width: 100%;
+  }
+
+  .header-right > button {
+    flex: 1;
+  }
+
+  .match-selector-card,
+  .match-controls-card,
+  .score-hero,
+  .player-card,
+  .scoring-card,
+  .history-card,
   .full-scorecard,
-  .current-over-card {
-    padding: 15px;
-    border-radius: 14px;
+  .current-over-card,
+  .start-match-card,
+  .new-bowler-card,
+  .manual-exception-panel {
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 13px;
+  }
+
+  .players-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .player-card.bowler-card {
+    grid-column: auto;
+  }
+
+  .score-hero h1 {
+    font-size: 35px;
+  }
+
+  .score-hero h2 {
+    font-size: 27px;
+  }
+
+  .run-buttons {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .run-button {
+    min-height: 52px;
+    font-size: 18px;
+  }
+
+  .special-buttons {
+    grid-template-columns: 1fr;
+    gap: 9px;
   }
 
   .scorecard-title-row h3 {
-    font-size: 19px;
-  }
-
-  .scorecard-table-heading,
-  .scorecard-batting-row {
-    grid-template-columns: minmax(100px, 1fr) minmax(175px, 1.3fr);
-    gap: 8px;
-    padding: 12px 10px;
-  }
-
-  .scorecard-heading-stats,
-  .scorecard-batting-stats {
-    gap: 5px;
-    font-size: 11px;
-  }
-
-  .scorecard-batter-name {
-    font-size: 12px;
-    overflow-wrap: anywhere;
-  }
-
-  .scorecard-summary-row,
-  .scorecard-total-row,
-  .scorecard-did-not-bat {
-    padding: 12px 10px;
-    gap: 8px;
-    font-size: 11px;
-  }
-
-  .scorecard-bowling-heading,
-  .scorecard-bowling-row {
-    grid-template-columns: minmax(80px, 0.8fr) minmax(245px, 2fr);
-    gap: 8px;
-    padding: 12px 10px;
-    font-size: 11px;
-  }
-
-  .scorecard-section-title {
-    padding: 14px 10px;
-  }
-
-  .scorecard-fow-heading,
-  .scorecard-fow-row {
-    grid-template-columns: minmax(100px, 2fr) 0.8fr 0.7fr;
-    gap: 8px;
-    padding: 12px 10px;
-    font-size: 11px;
-  }
-
-  .scorecard-latest-wicket {
-    padding: 14px;
-    gap: 10px;
-  }
-
-  .current-over-header h3 {
-    font-size: 19px;
+    font-size: 21px;
   }
 
   .current-over-balls {
-    gap: 9px;
+    gap: 8px;
     padding: 12px;
   }
 
+  .history-ball,
   .ball-result {
-    width: 38px;
-    height: 38px;
+    width: 37px;
+    height: 37px;
+  }
+
+  .new-bowler-form,
+  .exception-input-grid,
+  .exception-quick-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .completed-result-banner {
+    align-items: flex-start;
+    padding: 15px;
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 380px) {
+  .scoreboard-page {
+    padding: 9px;
+  }
+
+  .run-buttons {
+    gap: 6px;
+  }
+
+  .run-button {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .player-mini-stats {
+    gap: 6px;
+  }
+
+  .player-stat {
+    padding: 10px 4px;
+  }
+
+  .player-stat strong {
+    font-size: 17px;
+  }
+
   .scorecard-title-row {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .current-over-card {
-    padding: 12px;
-  }
-
-  .current-over-header {
-    align-items: flex-start;
-  }
-
-  .over-number {
-    padding: 9px;
-    font-size: 11px;
   }
 }
