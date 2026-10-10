@@ -27,6 +27,7 @@ import {
   tournamentAPI,
 } from "../services/api";
 
+import "./App.css";
 /* =========================================================
    HELPERS
 ========================================================= */
@@ -3257,73 +3258,6 @@ export default function Scoreboard() {
                 </div>
               </section>
 
-              <MatchScorecard
-                history={history}
-                score={score}
-                selectedMatch={selectedMatch}
-                strikerName={strikerName}
-                nonStrikerName={nonStrikerName}
-              />
-
-              {/* =================================================
-                  CURRENT OVER
-              ================================================= */}
-
-              <section className="current-over-card">
-                <div className="current-over-header">
-                  <div>
-                    <span className="eyebrow">BALL BY BALL</span>
-
-                    <h3>Current Over</h3>
-                  </div>
-
-                  <div className="over-number">
-                    Over{" "}
-                    {Math.floor(Number(score.balls || 0) / 6) +
-                      (Number(score.balls || 0) % 6 === 0 ? 0 : 1)}
-                  </div>
-                </div>
-
-                <div className="current-over-balls">
-                  {currentOverBalls.length === 0 && (
-                    <div className="empty-over">No deliveries recorded yet</div>
-                  )}
-
-                  {currentOverBalls.map((ball) => (
-                    <div
-                      key={ball.id}
-                      className={`ball-result ${
-                        ball.wicket ? "ball-wicket" : ""
-                      } ${!ball.legalBall ? "ball-extra" : ""}`}
-                      title={ball.description || ball.label}
-                    >
-                      <strong>{ball.label}</strong>
-
-                      {ball.wicket && (
-                        <span className="ball-wicket-mark">W</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="over-legend">
-                  <span>
-                    <i className="legend-dot legal" />
-                    Legal
-                  </span>
-
-                  <span>
-                    <i className="legend-dot extra" />
-                    Extra
-                  </span>
-
-                  <span>
-                    <i className="legend-dot wicket" />
-                    Wicket
-                  </span>
-                </div>
-              </section>
-
               {/* =================================================
                   SCORING
               ================================================= */}
@@ -3736,6 +3670,70 @@ export default function Scoreboard() {
             </>
           )}
       </main>
+      <MatchScorecard
+        history={history}
+        score={score}
+        selectedMatch={selectedMatch}
+        strikerName={strikerName}
+        nonStrikerName={nonStrikerName}
+      />
+
+      {/* =================================================
+                  CURRENT OVER
+              ================================================= */}
+
+      <section className="current-over-card">
+        <div className="current-over-header">
+          <div>
+            <span className="eyebrow">BALL BY BALL</span>
+
+            <h3>Current Over</h3>
+          </div>
+
+          <div className="over-number">
+            Over{" "}
+            {Math.floor(Number(score.balls || 0) / 6) +
+              (Number(score.balls || 0) % 6 === 0 ? 0 : 1)}
+          </div>
+        </div>
+
+        <div className="current-over-balls">
+          {currentOverBalls.length === 0 && (
+            <div className="empty-over">No deliveries recorded yet</div>
+          )}
+
+          {currentOverBalls.map((ball) => (
+            <div
+              key={ball.id}
+              className={`ball-result ${
+                ball.wicket ? "ball-wicket" : ""
+              } ${!ball.legalBall ? "ball-extra" : ""}`}
+              title={ball.description || ball.label}
+            >
+              <strong>{ball.label}</strong>
+
+              {ball.wicket && <span className="ball-wicket-mark">W</span>}
+            </div>
+          ))}
+        </div>
+
+        <div className="over-legend">
+          <span>
+            <i className="legend-dot legal" />
+            Legal
+          </span>
+
+          <span>
+            <i className="legend-dot extra" />
+            Extra
+          </span>
+
+          <span>
+            <i className="legend-dot wicket" />
+            Wicket
+          </span>
+        </div>
+      </section>
 
       {/* =====================================================
           LOADING
@@ -3794,6 +3792,295 @@ export default function Scoreboard() {
 
   --sb-radius: 22px;
 }
+  
+/* =========================================
+   MATCH SCORECARD
+========================================= */
+
+.match-scorecard {
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 24px;
+  background: linear-gradient(145deg, #17212b, #101820);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  color: #f1f5f9;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   CURRENT OVER CARD
+========================================= */
+
+.current-over-card {
+  width: 100%;
+  margin: 22px 0;
+  padding: 24px;
+  background: linear-gradient(145deg, #17212b, #101820);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+  color: #f1f5f9;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  transition: border-color 0.25s ease,
+              transform 0.25s ease;
+}
+
+.current-over-card:hover {
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+.current-over-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.current-over-header .eyebrow {
+  display: inline-block;
+  margin-bottom: 7px;
+  color: #22c55e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.current-over-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+/* Over number badge */
+
+.over-number {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 10px;
+  color: #4ade80;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+/* =========================================
+   BALL-BY-BALL RESULTS
+========================================= */
+
+.current-over-balls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  min-height: 68px;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+}
+
+.ball-result {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  background: #263544;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  color: #f8fafc;
+  font-size: 15px;
+  font-weight: 800;
+  box-sizing: border-box;
+  transition: transform 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+.ball-result:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* Wicket ball */
+
+.ball-result.ball-wicket {
+  background: #dc2626;
+  border-color: #f87171;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+}
+
+/* Extra delivery */
+
+.ball-result.ball-extra {
+  border: 2px dashed #f59e0b;
+  color: #fcd34d;
+}
+
+/* Wicket marker */
+
+.ball-wicket-mark {
+  position: absolute;
+  top: -8px;
+  right: -7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border: 2px solid #dc2626;
+  border-radius: 50%;
+  color: #dc2626;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+/* Empty over message */
+
+.empty-over {
+  width: 100%;
+  padding: 12px 8px;
+  color: #94a3b8;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* =========================================
+   OVER LEGEND
+========================================= */
+
+.over-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.over-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.legend-dot.legal {
+  background: #22c55e;
+}
+
+.legend-dot.extra {
+  background: #f59e0b;
+}
+
+.legend-dot.wicket {
+  background: #ef4444;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 768px) {
+  .current-over-card,
+  .match-scorecard {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .current-over-header {
+    margin-bottom: 18px;
+  }
+
+  .current-over-header h3 {
+    font-size: 20px;
+  }
+
+  .current-over-balls {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .ball-result {
+    width: 43px;
+    height: 43px;
+    font-size: 14px;
+  }
+
+  .over-legend {
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .current-over-card,
+  .match-scorecard {
+    padding: 14px;
+  }
+
+  .current-over-header h3 {
+    font-size: 18px;
+  }
+
+  .current-over-header .eyebrow {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+  }
+
+  .over-number {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .current-over-balls {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .ball-result {
+    width: 38px;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  .ball-wicket-mark {
+    width: 17px;
+    height: 17px;
+    top: -6px;
+    right: -6px;
+    font-size: 9px;
+  }
+
+  .over-legend {
+    gap: 12px;
+  }
+
+  .over-legend span {
+    gap: 6px;
+    font-size: 11px;
+  }
+}
+
 
 /* =========================================================
    PAGE
