@@ -3752,8 +3752,7 @@ export default function Scoreboard() {
           </div>
         </div>
       )}
-      <style>
-        {`
+      <style>{`
 /* =========================================================
    CRICKET COMMAND CENTER
    PREMIUM SCOREBOARD UI
@@ -7171,10 +7170,11 @@ input:focus, select:focus, textarea:focus {
   }
 }
 `}
-      </style>
+</style>
     </div>
   );
 }
+
 
 // import { useEffect, useMemo, useState } from "react";
 // import { useNavigate } from "react-router-dom";
@@ -10970,7 +10970,7 @@ input:focus, select:focus, textarea:focus {
 
 //   --sb-radius: 22px;
 // }
-
+  
 // /* =========================================
 //    MATCH SCORECARD
 // ========================================= */
@@ -11258,6 +11258,7 @@ input:focus, select:focus, textarea:focus {
 //     font-size: 11px;
 //   }
 // }
+
 
 // /* =========================================================
 //    PAGE
