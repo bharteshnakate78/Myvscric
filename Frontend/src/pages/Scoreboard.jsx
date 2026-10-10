@@ -19,7 +19,13 @@ import {
   Zap,
 } from "lucide-react";
 
-import { inningsAPI, matchAPI, playerAPI, scoreAPI, tournamentAPI } from "../services/api";
+import {
+  inningsAPI,
+  matchAPI,
+  playerAPI,
+  scoreAPI,
+  tournamentAPI,
+} from "../services/api";
 
 /* =========================================================
    HELPERS
@@ -959,14 +965,28 @@ export default function Scoreboard() {
       }
     };
     loadPlayers();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [selectedMatch?.id, selectedMatch?.matchId]);
 
   const normalizePlayerOption = (player) => ({
     id: player?.id ?? player?.playerId ?? player?.player_id ?? player?.name,
-    name: String(player?.name || player?.playerName || player?.fullName || "").trim(),
-    teamId: player?.teamId ?? player?.team?.id ?? player?.team_id ?? player?.team?.teamId,
-    teamName: String(player?.team?.teamName || player?.team?.name || player?.teamName || player?.team_name || "").trim(),
+    name: String(
+      player?.name || player?.playerName || player?.fullName || "",
+    ).trim(),
+    teamId:
+      player?.teamId ??
+      player?.team?.id ??
+      player?.team_id ??
+      player?.team?.teamId,
+    teamName: String(
+      player?.team?.teamName ||
+        player?.team?.name ||
+        player?.teamName ||
+        player?.team_name ||
+        "",
+    ).trim(),
     role: String(player?.role || player?.playerRole || "").toLowerCase(),
   });
 
@@ -974,22 +994,47 @@ export default function Scoreboard() {
   const team2IdForPlayers = getTeamId(selectedMatch, 2);
   const team1NameForPlayers = getTeamName(selectedMatch, 1);
   const team2NameForPlayers = getTeamName(selectedMatch, 2);
-  const activeBattingSide = String(score?.teamName || "") === String(team2NameForPlayers) ? 2 : 1;
+  const activeBattingSide =
+    String(score?.teamName || "") === String(team2NameForPlayers) ? 2 : 1;
   const activeBowlingSide = 3 - activeBattingSide;
-  const battingTeamIdForPlayers = activeBattingSide === 1 ? team1IdForPlayers : team2IdForPlayers;
-  const bowlingTeamIdForPlayers = activeBowlingSide === 1 ? team1IdForPlayers : team2IdForPlayers;
-  const battingTeamNameForPlayers = activeBattingSide === 1 ? team1NameForPlayers : team2NameForPlayers;
-  const bowlingTeamNameForPlayers = activeBowlingSide === 1 ? team1NameForPlayers : team2NameForPlayers;
-  const playersForTeam = (teamId, teamName) => registeredPlayers
-    .map(normalizePlayerOption)
-    .filter((player) => player.name && (
-      (teamId != null && player.teamId != null && String(player.teamId) === String(teamId)) ||
-      (teamName && player.teamName && player.teamName.toLowerCase() === String(teamName).toLowerCase())
-    ))
-    .filter((player, index, list) => list.findIndex((candidate) => candidate.name.toLowerCase() === player.name.toLowerCase()) === index)
-    .sort((a, b) => a.name.localeCompare(b.name));
-  const battingTeamPlayers = playersForTeam(battingTeamIdForPlayers, battingTeamNameForPlayers);
-  const bowlingTeamPlayers = playersForTeam(bowlingTeamIdForPlayers, bowlingTeamNameForPlayers);
+  const battingTeamIdForPlayers =
+    activeBattingSide === 1 ? team1IdForPlayers : team2IdForPlayers;
+  const bowlingTeamIdForPlayers =
+    activeBowlingSide === 1 ? team1IdForPlayers : team2IdForPlayers;
+  const battingTeamNameForPlayers =
+    activeBattingSide === 1 ? team1NameForPlayers : team2NameForPlayers;
+  const bowlingTeamNameForPlayers =
+    activeBowlingSide === 1 ? team1NameForPlayers : team2NameForPlayers;
+  const playersForTeam = (teamId, teamName) =>
+    registeredPlayers
+      .map(normalizePlayerOption)
+      .filter(
+        (player) =>
+          player.name &&
+          ((teamId != null &&
+            player.teamId != null &&
+            String(player.teamId) === String(teamId)) ||
+            (teamName &&
+              player.teamName &&
+              player.teamName.toLowerCase() ===
+                String(teamName).toLowerCase())),
+      )
+      .filter(
+        (player, index, list) =>
+          list.findIndex(
+            (candidate) =>
+              candidate.name.toLowerCase() === player.name.toLowerCase(),
+          ) === index,
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
+  const battingTeamPlayers = playersForTeam(
+    battingTeamIdForPlayers,
+    battingTeamNameForPlayers,
+  );
+  const bowlingTeamPlayers = playersForTeam(
+    bowlingTeamIdForPlayers,
+    bowlingTeamNameForPlayers,
+  );
 
   /* =======================================================
      RESET UI
@@ -3044,11 +3089,19 @@ export default function Scoreboard() {
                     <select
                       value={nextBowlerName}
                       onChange={(e) => setNextBowlerName(e.target.value)}
-                      disabled={playersLoading || bowlingTeamPlayers.length === 0}
+                      disabled={
+                        playersLoading || bowlingTeamPlayers.length === 0
+                      }
                     >
-                      <option value="">{playersLoading ? "Loading bowlers..." : `Select bowler (${bowlingTeamNameForPlayers || "bowling team"})`}</option>
+                      <option value="">
+                        {playersLoading
+                          ? "Loading bowlers..."
+                          : `Select bowler (${bowlingTeamNameForPlayers || "bowling team"})`}
+                      </option>
                       {bowlingTeamPlayers.map((player) => (
-                        <option key={player.id} value={player.name}>{player.name}</option>
+                        <option key={player.id} value={player.name}>
+                          {player.name}
+                        </option>
                       ))}
                     </select>
 
@@ -3081,9 +3134,15 @@ export default function Scoreboard() {
                       onChange={(e) => setStrikerName(e.target.value)}
                       disabled={!canUpdate || matchCompleted || playersLoading}
                     >
-                      <option value="">{playersLoading ? "Loading players..." : `Select striker (${battingTeamNameForPlayers || "batting team"})`}</option>
+                      <option value="">
+                        {playersLoading
+                          ? "Loading players..."
+                          : `Select striker (${battingTeamNameForPlayers || "batting team"})`}
+                      </option>
                       {battingTeamPlayers.map((player) => (
-                        <option key={player.id} value={player.name}>{player.name}</option>
+                        <option key={player.id} value={player.name}>
+                          {player.name}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -3120,10 +3179,18 @@ export default function Scoreboard() {
                       onChange={(e) => setNonStrikerName(e.target.value)}
                       disabled={!canUpdate || matchCompleted || playersLoading}
                     >
-                      <option value="">{playersLoading ? "Loading players..." : `Select non-striker (${battingTeamNameForPlayers || "batting team"})`}</option>
-                      {battingTeamPlayers.filter((player) => player.name !== strikerName).map((player) => (
-                        <option key={player.id} value={player.name}>{player.name}</option>
-                      ))}
+                      <option value="">
+                        {playersLoading
+                          ? "Loading players..."
+                          : `Select non-striker (${battingTeamNameForPlayers || "batting team"})`}
+                      </option>
+                      {battingTeamPlayers
+                        .filter((player) => player.name !== strikerName)
+                        .map((player) => (
+                          <option key={player.id} value={player.name}>
+                            {player.name}
+                          </option>
+                        ))}
                     </select>
                   </div>
 
@@ -3159,9 +3226,15 @@ export default function Scoreboard() {
                       onChange={(e) => setBowlerName(e.target.value)}
                       disabled={!canUpdate || matchCompleted || playersLoading}
                     >
-                      <option value="">{playersLoading ? "Loading bowlers..." : `Select bowler (${bowlingTeamNameForPlayers || "bowling team"})`}</option>
+                      <option value="">
+                        {playersLoading
+                          ? "Loading bowlers..."
+                          : `Select bowler (${bowlingTeamNameForPlayers || "bowling team"})`}
+                      </option>
                       {bowlingTeamPlayers.map((player) => (
-                        <option key={player.id} value={player.name}>{player.name}</option>
+                        <option key={player.id} value={player.name}>
+                          {player.name}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -13286,7 +13359,7 @@ button:disabled {
 //     display: none;
 //   }
 // }
-  
+
 // /* =========================================
 //    CRICKET SCORECARD
 //    ========================================= */
