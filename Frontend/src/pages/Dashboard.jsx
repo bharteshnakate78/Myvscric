@@ -253,7 +253,7 @@ function Dashboard() {
             </div>
 
             <h1>
-              Good afternoon, <span>{userName}</span>
+              Welcome Back, <span>{userName}</span>
             </h1>
 
             <p>
